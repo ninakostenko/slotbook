@@ -1,0 +1,158 @@
+// Database schema for SlotBook.
+// After changing this file, run: npx prisma migrate dev --name <what-changed>
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------------------------------------------------------------------------
+// Auth tables in the shape Better Auth expects (user, session, account,
+// verification). Better Auth reads and writes them; we only link to User.
+// ---------------------------------------------------------------------------
+
+model User {
+  id            String    @id
+  name          String
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @default(now()) @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+  business      Business?
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now()) @updatedAt
+
+  @@index([identifier])
+}
+
+// ---------------------------------------------------------------------------
+// SlotBook tables
+// ---------------------------------------------------------------------------
+
+enum BookingStatus {
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+// One business per owner: the page clients book on, at /book/<slug>.
+model Business {
+  id          String   @id @default(cuid())
+  ownerId     String   @unique
+  name        String
+  slug        String   @unique
+  description String?
+  address     String?
+  timezone    String   @default("Europe/Kyiv")
+  createdAt   DateTime @default(now()) @db.Timestamptz
+
+  owner        User           @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  services     Service[]
+  workingHours WorkingHours[]
+  timeOff      TimeOff[]
+  bookings     Booking[]
+}
+
+model Service {
+  id              String  @id @default(cuid())
+  businessId      String
+  name            String
+  durationMinutes Int
+  priceCents      Int // 50000 = 500.00, money is stored in whole cents
+  isActive        Boolean @default(true) // turned off instead of deleted, so old bookings keep their service
+
+  business Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  bookings Booking[]
+
+  @@index([businessId])
+}
+
+// Weekly schedule: one row per working day.
+model WorkingHours {
+  id          String @id @default(cuid())
+  businessId  String
+  dayOfWeek   Int // 0 = Sunday, 1 = Monday ... 6 = Saturday
+  startMinute Int // minutes from midnight: 540 = 09:00
+  endMinute   Int // 1080 = 18:00
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@unique([businessId, dayOfWeek])
+}
+
+// Whole days off, such as holidays or vacation.
+model TimeOff {
+  id         String   @id @default(cuid())
+  businessId String
+  date       DateTime @db.Date
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@unique([businessId, date])
+}
+
+model Booking {
+  id          String        @id @default(cuid())
+  businessId  String
+  serviceId   String
+  clientName  String
+  clientEmail String
+  startsAt    DateTime      @db.Timestamptz
+  endsAt      DateTime      @db.Timestamptz
+  status      BookingStatus @default(CONFIRMED)
+  cancelToken String        @unique @default(uuid()) // secret part of the client's cancel link
+  createdAt   DateTime      @default(now()) @db.Timestamptz
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  service  Service  @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+
+  @@index([businessId, startsAt])
+}
