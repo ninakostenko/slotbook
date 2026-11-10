@@ -42,9 +42,13 @@ Prisma 7 with Neon Postgres. Prisma is pinned to 7.10.1 on purpose: npm's `lates
 - To change the schema, run `npx prisma migrate dev --name <change>`, then `npx prisma generate`.
 - The constraint that blocks overlapping bookings is planned as a hand-written SQL migration: a PostgreSQL exclusion constraint on `Booking`.
 
+## Auth
+
+Better Auth with email and password. The server config is in `lib/auth.ts` (Prisma adapter, `nextCookies` plugin last), the browser client is in `lib/auth-client.ts`, and every `/api/auth/*` request goes through `app/api/auth/[...all]/route.ts`. The `/sign-up` and `/sign-in` pages are in the `app/(auth)` route group. Their forms are client components in `components/auth/`, built with React Hook Form and validated by the Zod schemas in `lib/validations/auth.ts`.
+
 ## Planned, not yet installed
 
-`.env.example` also lists Better Auth variables and a `CRON_SECRET` that protects a daily demo reset route.
+`.env.example` also lists a `CRON_SECRET` that protects a daily demo reset route.
 
 ## Figma reference
 
