@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 
 import { BottomNav, SidebarNav } from "@/components/dashboard/nav-links";
+import { SignOutButton } from "@/components/dashboard/sign-out-button";
 import { UserMenu, UserMenuSkeleton } from "@/components/dashboard/user-menu";
 
 function Logo() {
@@ -36,6 +37,7 @@ export default function DashboardLayout({
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="flex items-center justify-between border-b px-4 py-3 md:hidden">
           <Logo />
+          <SignOutButton />
         </header>
         <main className="flex-1 px-4 py-6 pb-24 md:px-8 md:pb-8">
           {children}

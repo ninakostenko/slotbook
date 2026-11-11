@@ -1,3 +1,4 @@
+import { SignOutButton } from "@/components/dashboard/sign-out-button";
 import { getCurrentUser } from "@/lib/dal";
 
 // Reads the session, so the layout renders it inside <Suspense>.
@@ -22,7 +23,7 @@ export async function UserMenu() {
         <p className="truncate text-sm font-medium">{user.name}</p>
         <p className="truncate text-xs text-muted-foreground">{user.email}</p>
       </div>
-      {/* TODO (Nina): <SignOutButton /> goes here */}
+      <SignOutButton />
     </div>
   );
 }
