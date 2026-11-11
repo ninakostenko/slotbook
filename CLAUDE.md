@@ -46,6 +46,11 @@ Prisma 7 with Neon Postgres. Prisma is pinned to 7.10.1 on purpose: npm's `lates
 
 Better Auth with email and password. The server config is in `lib/auth.ts` (Prisma adapter, `nextCookies` plugin last), the browser client is in `lib/auth-client.ts`, and every `/api/auth/*` request goes through `app/api/auth/[...all]/route.ts`. The `/sign-up` and `/sign-in` pages are in the `app/(auth)` route group. Their forms are client components in `components/auth/`, built with React Hook Form and validated by the Zod schemas in `lib/validations/auth.ts`.
 
+Protected pages are checked twice:
+
+- `proxy.ts` (the Next.js 16 name for middleware) redirects `/dashboard/*` to `/sign-in` when there is no session cookie. It only looks at the cookie, never the database.
+- `lib/dal.ts` `getCurrentUser()` does the real check against the database and redirects when the session is invalid. Every server page, action or handler that needs the user must call it. With `cacheComponents`, a component that calls it must render inside `<Suspense>`. Keep it out of a layout's top level, so the shell stays prerendered (the dashboard routes build as Partial Prerender).
+
 ## Planned, not yet installed
 
 `.env.example` also lists a `CRON_SECRET` that protects a daily demo reset route.
