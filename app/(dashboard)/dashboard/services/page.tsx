@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
+
+import { getCurrentBusiness } from "@/lib/dal";
+import { prisma } from "@/lib/db";
 
 export const metadata: Metadata = {
   title: "Services · SlotBook",
 };
 
-// Placeholder until this section is built (Week 2 of the plan).
 export default function ServicesPage() {
   return (
     <div className="mx-auto max-w-5xl">
@@ -14,9 +17,33 @@ export default function ServicesPage() {
       <p className="mt-2 text-muted-foreground">
         Add the services clients can book.
       </p>
-      <div className="mt-8 rounded-lg border border-dashed p-10 text-center text-sm text-muted-foreground">
-        Coming soon
-      </div>
+
+      <Suspense fallback={<p className="mt-8">Loading…</p>}>
+        <ServicesList />
+      </Suspense>
     </div>
+  );
+}
+
+async function ServicesList() {
+  const business = await getCurrentBusiness();
+  if (!business) return null;
+
+  const services = await prisma.service.findMany({
+    where: { businessId: business.id },
+    orderBy: { name: "asc" },
+  });
+
+  return (
+    <ul className="mt-8 divide-y rounded-lg border">
+      {services.map((service) => (
+        <li key={service.id} className="flex items-center justify-between p-4">
+          <span className="font-medium">{service.name}</span>
+          <span className="text-sm text-muted-foreground">
+            {service.durationMinutes} min · {service.priceCents / 100} UAH
+          </span>
+        </li>
+      ))}
+    </ul>
   );
 }
