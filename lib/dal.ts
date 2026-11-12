@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { cache } from "react";
 
 import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/db";
 
 // Data Access Layer: the one place that decides who the current user is.
 // Every page or action that needs the user calls this, so the check cannot be forgotten.
@@ -22,4 +23,14 @@ export const getCurrentUser = cache(async () => {
     name: session.user.name,
     email: session.user.email,
   };
+});
+
+// The signed-in owner's business, or null if they have not finished onboarding.
+export const getCurrentBusiness = cache(async () => {
+  const user = await getCurrentUser();
+
+  return prisma.business.findUnique({
+    where: { ownerId: user.id },
+    select: { id: true, name: true, slug: true },
+  });
 });

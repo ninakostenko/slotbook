@@ -51,6 +51,12 @@ Protected pages are checked twice:
 - `proxy.ts` (the Next.js 16 name for middleware) redirects `/dashboard/*` to `/sign-in` when there is no session cookie. It only looks at the cookie, never the database.
 - `lib/dal.ts` `getCurrentUser()` does the real check against the database and redirects when the session is invalid. Every server page, action or handler that needs the user must call it. With `cacheComponents`, a component that calls it must render inside `<Suspense>`. Keep it out of a layout's top level, so the shell stays prerendered (the dashboard routes build as Partial Prerender).
 
+## Onboarding
+
+Each owner has at most one `Business`. `/onboarding` is a three-step client wizard (business, first service, working hours) that submits once to the `completeOnboarding` Server Action in `app/onboarding/actions.ts`. The action re-checks the user and re-validates with `onboardingSchema`, then saves everything in one nested `prisma.business.create`. A `P2002` error there means the slug is taken. `getCurrentBusiness()` in `lib/dal.ts` drives the redirects both ways: `RequireBusiness`, rendered in the dashboard layout, sends owners without a business to `/onboarding`, and `/onboarding` sends owners who already have one to `/dashboard`.
+
+Server Actions are public endpoints, so every action must call the DAL and validate its input on the server, even when the form already validated it.
+
 ## Planned, not yet installed
 
 `.env.example` also lists a `CRON_SECRET` that protects a daily demo reset route.
