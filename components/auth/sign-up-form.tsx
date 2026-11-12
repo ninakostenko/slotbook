@@ -52,8 +52,7 @@ export function SignUpForm() {
       return;
     }
 
-    // TODO (step 5): send new owners to /onboarding instead, once that page exists.
-    router.push("/dashboard");
+    router.push("/onboarding");
     router.refresh();
   }
 

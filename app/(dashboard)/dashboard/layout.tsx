@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 
 import { BottomNav, SidebarNav } from "@/components/dashboard/nav-links";
+import { RequireBusiness } from "@/components/dashboard/require-business";
 import { SignOutButton } from "@/components/dashboard/sign-out-button";
 import { UserMenu, UserMenuSkeleton } from "@/components/dashboard/user-menu";
 
@@ -24,6 +25,10 @@ export default function DashboardLayout({
 }: LayoutProps<"/dashboard">) {
   return (
     <div className="flex min-h-full flex-1">
+      <Suspense fallback={null}>
+        <RequireBusiness />
+      </Suspense>
+
       <aside className="sticky top-0 hidden h-dvh w-60 shrink-0 flex-col gap-6 border-r p-4 md:flex">
         <Logo />
         <SidebarNav />
