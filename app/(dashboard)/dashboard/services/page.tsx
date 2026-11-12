@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 
+import { AddServiceDialog } from "@/components/services/add-service-dialog";
 import { getCurrentBusiness } from "@/lib/dal";
 import { prisma } from "@/lib/db";
-import { AddServiceDialog } from "@/components/services/add-service-dialog";
 
 export const metadata: Metadata = {
   title: "Services · SlotBook",
