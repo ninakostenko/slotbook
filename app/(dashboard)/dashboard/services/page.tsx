@@ -3,6 +3,7 @@ import { Suspense } from "react";
 
 import { getCurrentBusiness } from "@/lib/dal";
 import { prisma } from "@/lib/db";
+import { AddServiceDialog } from "@/components/services/add-service-dialog";
 
 export const metadata: Metadata = {
   title: "Services · SlotBook",
@@ -11,12 +12,17 @@ export const metadata: Metadata = {
 export default function ServicesPage() {
   return (
     <div className="mx-auto max-w-5xl">
-      <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-        Services
-      </h1>
-      <p className="mt-2 text-muted-foreground">
-        Add the services clients can book.
-      </p>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+            Services
+          </h1>
+          <p className="mt-2 text-muted-foreground">
+            Add the services clients can book.
+          </p>
+        </div>
+        <AddServiceDialog/>
+      </div>
 
       <Suspense fallback={<p className="mt-8">Loading…</p>}>
         <ServicesList />
