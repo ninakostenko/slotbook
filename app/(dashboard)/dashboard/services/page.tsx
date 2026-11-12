@@ -21,7 +21,7 @@ export default function ServicesPage() {
             Add the services clients can book.
           </p>
         </div>
-        <AddServiceDialog/>
+        <AddServiceDialog />
       </div>
 
       <Suspense fallback={<p className="mt-8">Loading…</p>}>
