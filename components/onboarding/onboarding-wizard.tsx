@@ -24,6 +24,7 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { weekDays } from "@/lib/time";
 import {
   onboardingSchema,
   type OnboardingInput,
@@ -49,17 +50,6 @@ const steps: {
     description: "Clients can only book inside these hours.",
     fields: ["schedule.days"],
   },
-];
-
-// Shown Monday first. dayOfWeek follows JavaScript: 0 = Sunday.
-const weekDays = [
-  { dayOfWeek: 1, label: "Monday" },
-  { dayOfWeek: 2, label: "Tuesday" },
-  { dayOfWeek: 3, label: "Wednesday" },
-  { dayOfWeek: 4, label: "Thursday" },
-  { dayOfWeek: 5, label: "Friday" },
-  { dayOfWeek: 6, label: "Saturday" },
-  { dayOfWeek: 0, label: "Sunday" },
 ];
 
 // "Anna's Studio" -> "annas-studio". Non-Latin letters are dropped,
