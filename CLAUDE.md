@@ -57,6 +57,10 @@ Each owner has at most one `Business`. `/onboarding` is a three-step client wiza
 
 Server Actions are public endpoints, so every action must call the DAL and validate its input on the server, even when the form already validated it.
 
+## Schedule and time
+
+`WorkingHours` stores minutes from midnight (540 = 09:00), one row per working day. Missing days are closed. `lib/time.ts` holds `weekDays` (Monday first; `dayOfWeek` 0 = Sunday), `timeToMinutes`, `minutesToTime` and `timeOptions`. `updateSchedule` replaces all of a business's rows in one `prisma.$transaction` (`deleteMany`, then `createMany`). Time fields use `components/schedule/time-select.tsx` (shadcn Select, 24-hour, 15-minute steps) instead of `<input type="time">`, whose native picker cannot be styled and shows AM/PM on some systems. Keep storage locale-free; if i18n is added, format only the labels with `Intl.DateTimeFormat`.
+
 ## Services
 
 `/dashboard/services` lists the business's services, with create and edit dialogs in `components/services/` and actions in `app/(dashboard)/dashboard/services/actions.ts`. Each action follows the same order: get the business from the DAL, `safeParse` the input, write, then `revalidatePath`. Updates use `updateMany` with `where: { id, businessId }` and treat `count === 0` as not found, so an owner cannot change another business's rows by sending its id. Services are hidden with `isActive`, never deleted, because bookings reference them. The active switch uses `useOptimistic` inside `startTransition`.
