@@ -3,6 +3,8 @@ import { Suspense } from "react";
 
 import { AddServiceDialog } from "@/components/services/add-service-dialog";
 import { EditServiceDialog } from "@/components/services/edit-service-dialog";
+import { ServiceActiveSwitch } from "@/components/services/service-active-switch";
+import { Badge } from "@/components/ui/badge";
 import { getCurrentBusiness } from "@/lib/dal";
 import { prisma } from "@/lib/db";
 
@@ -38,19 +40,51 @@ async function ServicesList() {
 
   const services = await prisma.service.findMany({
     where: { businessId: business.id },
-    orderBy: { name: "asc" },
+    // Active services first, then hidden ones; each group A to Z.
+    orderBy: [{ isActive: "desc" }, { name: "asc" }],
   });
+
+  // Empty state: tell the owner what to do instead of showing a blank box.
+  if (services.length === 0) {
+    return (
+      <div className="mt-8 rounded-lg border border-dashed p-10 text-center">
+        <p className="font-medium">No services yet</p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Add your first service so clients can book it.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <ul className="mt-8 divide-y rounded-lg border">
       {services.map((service) => (
-        <li key={service.id} className="flex items-center justify-between p-4">
-          <span className="font-medium">{service.name}</span>
+        <li
+          key={service.id}
+          className="flex flex-wrap items-center justify-between gap-2 p-4"
+        >
+          <div className="flex items-center gap-2">
+            <span
+              className={
+                service.isActive
+                  ? "font-medium"
+                  : "font-medium text-muted-foreground"
+              }
+            >
+              {service.name}
+            </span>
+            {!service.isActive && <Badge variant="secondary">Hidden</Badge>}
+          </div>
           <div className="flex items-center gap-2">
             <span className="text-sm text-muted-foreground">
               {service.durationMinutes} min · {service.priceCents / 100} UAH
             </span>
             <EditServiceDialog service={service} />
+            <ServiceActiveSwitch
+              serviceId={service.id}
+              serviceName={service.name}
+              isActive={service.isActive}
+            />
           </div>
         </li>
       ))}
