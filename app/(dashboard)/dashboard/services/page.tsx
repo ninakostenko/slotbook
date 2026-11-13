@@ -40,8 +40,8 @@ async function ServicesList() {
 
   const services = await prisma.service.findMany({
     where: { businessId: business.id },
-    // Active services first, then hidden ones; each group A to Z.
-    orderBy: [{ isActive: "desc" }, { name: "asc" }],
+    // By name only, so a row stays in place when its switch is toggled.
+    orderBy: [{ name: "asc" }],
   });
 
   // Empty state: tell the owner what to do instead of showing a blank box.
@@ -61,24 +61,27 @@ async function ServicesList() {
       {services.map((service) => (
         <li
           key={service.id}
-          className="flex flex-wrap items-center justify-between gap-2 p-4"
+          className="flex items-center justify-between gap-3 p-4"
         >
-          <div className="flex items-center gap-2">
-            <span
-              className={
-                service.isActive
-                  ? "font-medium"
-                  : "font-medium text-muted-foreground"
-              }
-            >
-              {service.name}
-            </span>
-            {!service.isActive && <Badge variant="secondary">Hidden</Badge>}
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              <span
+                className={
+                  service.isActive
+                    ? "truncate font-medium"
+                    : "truncate font-medium text-muted-foreground"
+                }
+              >
+                {service.name}
+              </span>
+              {!service.isActive && <Badge variant="secondary">Hidden</Badge>}
+            </div>
+            <p className="mt-0.5 text-sm text-muted-foreground">
               {service.durationMinutes} min · {service.priceCents / 100} UAH
-            </span>
+            </p>
+          </div>
+
+          <div className="flex shrink-0 items-center gap-1">
             <EditServiceDialog service={service} />
             <ServiceActiveSwitch
               serviceId={service.id}
