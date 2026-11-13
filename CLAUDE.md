@@ -57,6 +57,10 @@ Each owner has at most one `Business`. `/onboarding` is a three-step client wiza
 
 Server Actions are public endpoints, so every action must call the DAL and validate its input on the server, even when the form already validated it.
 
+## Services
+
+`/dashboard/services` lists the business's services, with create and edit dialogs in `components/services/` and actions in `app/(dashboard)/dashboard/services/actions.ts`. Each action follows the same order: get the business from the DAL, `safeParse` the input, write, then `revalidatePath`. Updates use `updateMany` with `where: { id, businessId }` and treat `count === 0` as not found, so an owner cannot change another business's rows by sending its id. Services are hidden with `isActive`, never deleted, because bookings reference them. The active switch uses `useOptimistic` inside `startTransition`.
+
 ## Planned, not yet installed
 
 `.env.example` also lists a `CRON_SECRET` that protects a daily demo reset route.
