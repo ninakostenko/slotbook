@@ -78,3 +78,10 @@ export const onboardingSchema = z.object({
 });
 
 export type OnboardingInput = z.infer<typeof onboardingSchema>;
+
+// A whole day off, as "YYYY-MM-DD" (the format of <input type="date"> and of the calendar).
+export const timeOffSchema = z.object({
+  date: z.iso.date("Pick a date"),
+});
+
+export type TimeOffInput = z.infer<typeof timeOffSchema>;

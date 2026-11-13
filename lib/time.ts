@@ -30,3 +30,30 @@ export function timeOptions(stepMinutes = 30) {
   }
   return options;
 }
+
+// A calendar Date (local midnight) -> "2026-12-31".
+// Uses the local date parts on purpose: toISOString() converts to UTC first
+// and can return the previous day for time zones east of UTC.
+export function toDateString(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+// Today's date in the business's time zone, as "2026-12-31".
+// The "en-CA" locale happens to format dates as YYYY-MM-DD.
+export function todayInTimeZone(timeZone: string) {
+  return new Intl.DateTimeFormat("en-CA", { timeZone }).format(new Date());
+}
+
+// A day stored at midnight UTC -> "Thu, 31 Dec 2026". Formatted in UTC so it never shifts a day.
+export function formatDay(date: Date) {
+  return new Intl.DateTimeFormat("en-GB", {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(date);
+}
