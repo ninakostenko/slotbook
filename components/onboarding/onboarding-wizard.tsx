@@ -269,14 +269,14 @@ export function OnboardingWizard() {
                       <div className="flex items-center gap-2">
                         <Input
                           type="time"
-                          className="w-28"
+                          className="w-36"
                           aria-label={`${label} start`}
                           {...register(`schedule.days.${index}.start`)}
                         />
                         <span className="text-muted-foreground">–</span>
                         <Input
                           type="time"
-                          className="w-28"
+                          className="w-36"
                           aria-label={`${label} end`}
                           aria-invalid={!!endError}
                           {...register(`schedule.days.${index}.end`)}
