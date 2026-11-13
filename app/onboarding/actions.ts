@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { getCurrentBusiness, getCurrentUser } from "@/lib/dal";
 import { prisma } from "@/lib/db";
 import { Prisma } from "@/lib/generated/prisma/client";
+import { timeToMinutes } from "@/lib/time";
 import { onboardingSchema } from "@/lib/validations/onboarding";
 
 export type OnboardingResult = {
@@ -12,11 +13,6 @@ export type OnboardingResult = {
   // Set when the error belongs to a specific field, so the form can show it there.
   field?: "business.slug";
 };
-
-function timeToMinutes(time: string) {
-  const [hours = 0, minutes = 0] = time.split(":").map(Number);
-  return hours * 60 + minutes;
-}
 
 // A Server Action: runs on the server, but the form calls it like a normal async function.
 // Anyone can call it with any data, so it checks the user and validates the input itself.
