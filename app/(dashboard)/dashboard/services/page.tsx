@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 
 import { AddServiceDialog } from "@/components/services/add-service-dialog";
+import { EditServiceDialog } from "@/components/services/edit-service-dialog";
 import { getCurrentBusiness } from "@/lib/dal";
 import { prisma } from "@/lib/db";
 
@@ -45,9 +46,12 @@ async function ServicesList() {
       {services.map((service) => (
         <li key={service.id} className="flex items-center justify-between p-4">
           <span className="font-medium">{service.name}</span>
-          <span className="text-sm text-muted-foreground">
-            {service.durationMinutes} min · {service.priceCents / 100} UAH
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">
+              {service.durationMinutes} min · {service.priceCents / 100} UAH
+            </span>
+            <EditServiceDialog service={service} />
+          </div>
         </li>
       ))}
     </ul>
