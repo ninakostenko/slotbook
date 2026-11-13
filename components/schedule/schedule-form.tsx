@@ -8,7 +8,7 @@ import { Controller, useForm, useWatch } from "react-hook-form";
 import { updateSchedule } from "@/app/(dashboard)/dashboard/schedule/actions";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
+import { TimeSelect } from "@/components/schedule/time-select";
 import { weekDays } from "@/lib/time";
 import {
   scheduleSchema,
@@ -24,7 +24,6 @@ export function ScheduleForm({ days: savedDays }: ScheduleFormProps) {
   const [saved, setSaved] = useState(false);
 
   const {
-    register,
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
@@ -81,19 +80,29 @@ export function ScheduleForm({ days: savedDays }: ScheduleFormProps) {
 
               {enabled ? (
                 <div className="flex items-center gap-2">
-                  <Input
-                    type="time"
-                    className="w-36"
-                    aria-label={`${label} start`}
-                    {...register(`days.${index}.start`)}
+                  <Controller
+                    control={control}
+                    name={`days.${index}.start`}
+                    render={({ field }) => (
+                      <TimeSelect
+                        value={field.value}
+                        onChange={field.onChange}
+                        aria-label={`${label} start`}
+                      />
+                    )}
                   />
                   <span className="text-muted-foreground">–</span>
-                  <Input
-                    type="time"
-                    className="w-36"
-                    aria-label={`${label} end`}
-                    aria-invalid={!!endError}
-                    {...register(`days.${index}.end`)}
+                  <Controller
+                    control={control}
+                    name={`days.${index}.end`}
+                    render={({ field }) => (
+                      <TimeSelect
+                        value={field.value}
+                        onChange={field.onChange}
+                        aria-label={`${label} end`}
+                        invalid={!!endError}
+                      />
+                    )}
                   />
                 </div>
               ) : (

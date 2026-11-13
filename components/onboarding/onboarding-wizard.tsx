@@ -24,6 +24,7 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { TimeSelect } from "@/components/schedule/time-select";
 import { weekDays } from "@/lib/time";
 import {
   onboardingSchema,
@@ -267,19 +268,29 @@ export function OnboardingWizard() {
 
                     {enabled ? (
                       <div className="flex items-center gap-2">
-                        <Input
-                          type="time"
-                          className="w-36"
-                          aria-label={`${label} start`}
-                          {...register(`schedule.days.${index}.start`)}
+                        <Controller
+                          control={control}
+                          name={`schedule.days.${index}.start`}
+                          render={({ field }) => (
+                            <TimeSelect
+                              value={field.value}
+                              onChange={field.onChange}
+                              aria-label={`${label} start`}
+                            />
+                          )}
                         />
                         <span className="text-muted-foreground">–</span>
-                        <Input
-                          type="time"
-                          className="w-36"
-                          aria-label={`${label} end`}
-                          aria-invalid={!!endError}
-                          {...register(`schedule.days.${index}.end`)}
+                        <Controller
+                          control={control}
+                          name={`schedule.days.${index}.end`}
+                          render={({ field }) => (
+                            <TimeSelect
+                              value={field.value}
+                              onChange={field.onChange}
+                              aria-label={`${label} end`}
+                              invalid={!!endError}
+                            />
+                          )}
                         />
                       </div>
                     ) : (

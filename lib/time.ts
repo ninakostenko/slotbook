@@ -21,3 +21,12 @@ export function minutesToTime(totalMinutes: number) {
 
   return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
 }
+
+// Every time of day in steps: ["00:00", "00:30", ..., "23:30"] for a 30-minute step.
+export function timeOptions(stepMinutes = 30) {
+  const options: string[] = [];
+  for (let minutes = 0; minutes < 24 * 60; minutes += stepMinutes) {
+    options.push(minutesToTime(minutes));
+  }
+  return options;
+}
