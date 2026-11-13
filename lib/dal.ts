@@ -31,6 +31,6 @@ export const getCurrentBusiness = cache(async () => {
 
   return prisma.business.findUnique({
     where: { ownerId: user.id },
-    select: { id: true, name: true, slug: true },
+    select: { id: true, name: true, slug: true, timezone: true },
   });
 });
