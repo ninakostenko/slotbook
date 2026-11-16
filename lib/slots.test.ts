@@ -35,4 +35,15 @@ describe("getAvailableSlots", () => {
 
     expect(slots).toEqual([540, 660]);
   });
+  test("skips start times before the earliest allowed start", () => {
+    const slots = getAvailableSlots({
+      workingHours: { start: 540, end: 720 }, // 09:00–12:00
+      durationMinutes: 60,
+      bookings: [],
+      stepMinutes: 30,
+      earliestStart: 615, // 10:15, so 09:00, 09:30 and 10:00 are in the past
+    });
+
+    expect(slots).toEqual([630, 660]); // 10:30 and 11:00
+  });
 });

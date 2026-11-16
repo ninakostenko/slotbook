@@ -15,6 +15,9 @@ export type GetAvailableSlotsInput = {
   bookings: TimeRange[];
   // How often a slot can start: 15 means 09:00, 09:15, 09:30...
   stepMinutes: number;
+  // The earliest minute a slot may start, for example the current time today.
+  // Leave it out for other days.
+  earliestStart?: number;
 };
 
 // Returns the start minute of every free slot, for example [540, 555, 570].
@@ -23,6 +26,7 @@ export function getAvailableSlots({
   durationMinutes,
   bookings,
   stepMinutes,
+  earliestStart = 0,
 }: GetAvailableSlotsInput): number[] {
   if (!workingHours) {
     return [];
@@ -38,6 +42,7 @@ export function getAvailableSlots({
       (booking) => start < booking.end && booking.start < end,
     );
     if (overlaps) continue;
+    if (start < earliestStart) continue;
 
     slots.push(start);
   }
