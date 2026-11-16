@@ -33,6 +33,12 @@ export function getAvailableSlots({
     start + durationMinutes <= workingHours.end;
     start += stepMinutes
   ) {
+    const end = start + durationMinutes;
+    const overlaps = bookings.some(
+      (booking) => start < booking.end && booking.start < end,
+    );
+    if (overlaps) continue;
+
     slots.push(start);
   }
   return slots;

@@ -24,4 +24,15 @@ describe("getAvailableSlots", () => {
 
     expect(slots).toEqual([540, 555, 570, 585, 600]);
   });
+
+  test("skips start times that overlap a booking", () => {
+    const slots = getAvailableSlots({
+      workingHours: { start: 540, end: 720 }, // 09:00–12:00
+      durationMinutes: 60,
+      bookings: [{ start: 600, end: 660 }], // booked 10:00–11:00
+      stepMinutes: 30,
+    });
+
+    expect(slots).toEqual([540, 660]);
+  });
 });
