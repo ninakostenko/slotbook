@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/db";
 import { getAvailableSlots } from "@/lib/slots";
-import { dateInTimeZone, minutesInTimeZone } from "@/lib/time";
+import { dateInTimeZone, minutesInTimeZone, todayInTimeZone } from "@/lib/time";
 
 // Free start times for one service on one day, as minutes from midnight.
 // Example: getSlotsForDay("biz1", "svc1", "2026-12-01") -> [540, 555, 570, ...]
@@ -65,10 +65,17 @@ export async function getSlotsForDay(
       end: minutesInTimeZone(b.endsAt, timezone),
     }));
 
+  // For today, slots that already started are not offered. Other days have no limit.
+  const earliestStart =
+    date === todayInTimeZone(timezone)
+      ? minutesInTimeZone(new Date(), timezone)
+      : undefined;
+
   return getAvailableSlots({
     workingHours,
     durationMinutes: service.durationMinutes,
     bookings,
     stepMinutes: 15,
+    earliestStart,
   });
 }
