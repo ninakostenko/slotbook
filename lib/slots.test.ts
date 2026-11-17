@@ -57,4 +57,15 @@ describe("getAvailableSlots", () => {
 
     expect(slots).toEqual([540, 660]);
   });
+
+  test("returns no slots when the service is longer than the working day", () => {
+    const slots = getAvailableSlots({
+      workingHours: { start: 540, end: 600 },
+      durationMinutes: 90,
+      bookings: [],
+      stepMinutes: 15,
+    });
+
+    expect(slots).toEqual([]);
+  });
 });
