@@ -57,3 +57,24 @@ export function formatDay(date: Date) {
     timeZone: "UTC",
   }).format(date);
 }
+
+// A moment in time -> the calendar date there, as "2026-12-31".
+// Bookings are stored as exact moments (UTC); this tells which day a moment is on
+// in the business's time zone.
+export function dateInTimeZone(moment: Date, timeZone: string) {
+  return new Intl.DateTimeFormat("en-CA", { timeZone }).format(moment);
+}
+
+// A moment in time -> minutes from midnight in the business's time zone.
+// Example: 07:30 UTC is 10:30 in Europe/Kyiv in summer, so this returns 630.
+export function minutesInTimeZone(moment: Date, timeZone: string) {
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone,
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(moment);
+  const hours = Number(parts.find((part) => part.type === "hour")?.value);
+  const minutes = Number(parts.find((part) => part.type === "minute")?.value);
+  return hours * 60 + minutes;
+}
