@@ -10,7 +10,8 @@
     "typecheck": "next typegen && tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "test": "node scripts/test.mjs run"
   },
   "dependencies": {
     "@hookform/resolvers": "5.9.2",
@@ -34,7 +35,7 @@
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "^4",
-    "@types/node": "^20",
+    "@types/node": "22.20.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "dotenv": "18.0.9",
@@ -45,7 +46,9 @@
     "prettier-plugin-tailwindcss": "^0.8.1",
     "prisma": "7.10.1",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vite": "8.3.8",
+    "vitest": "5.0.5"
   },
   "engines": {
     "node": ">=22"

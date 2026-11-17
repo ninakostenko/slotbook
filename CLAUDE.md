@@ -19,9 +19,11 @@ npm run format        # Prettier, write changes
 npm run format:check  # Prettier, check only
 ```
 
-CI runs `format:check`, `lint`, `typecheck` and `build`, in that order, on every pull request and on pushes to `main`.
+CI runs `format:check`, `lint`, `typecheck`, `test` and `build`, in that order, on every pull request and on pushes to `main`.
 
-No test runner is configured, so there is no test command yet.
+`npm test` runs Vitest (`vitest.config.mts`, files `**/*.test.ts`) through `scripts/test.mjs`. The wrapper upper-cases the drive letter, because Vitest started from a `c:\` path (VS Code's default on Windows) loads itself twice and every test fails with "Cannot read properties of undefined (reading 'config')". CI runs `npm test` after `typecheck`.
+
+npm 10.5 sometimes crashes on install with "Cannot read properties of null (reading 'edgesOut')". Adding `--legacy-peer-deps` gets past it; `vite` is a direct dev dependency so that flag still installs it.
 
 ## Architecture
 
