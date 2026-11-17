@@ -46,4 +46,15 @@ describe("getAvailableSlots", () => {
 
     expect(slots).toEqual([630, 660]); // 10:30 and 11:00
   });
+
+  test("allows a slot that starts exactly when a booking ends", () => {
+    const slots = getAvailableSlots({
+      workingHours: { start: 540, end: 720 },
+      durationMinutes: 60,
+      bookings: [{ start: 600, end: 660 }],
+      stepMinutes: 60,
+    });
+
+    expect(slots).toEqual([540, 660]);
+  });
 });
