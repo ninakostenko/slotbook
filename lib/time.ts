@@ -78,3 +78,21 @@ export function minutesInTimeZone(moment: Date, timeZone: string) {
   const minutes = Number(parts.find((part) => part.type === "minute")?.value);
   return hours * 60 + minutes;
 }
+
+// A calendar date plus some days, as "YYYY-MM-DD": addDays("2026-12-31", 1) is "2027-01-01".
+// It works on UTC midnight, so no time zone or daylight saving change can shift the day.
+export function addDays(date: string, days: number) {
+  const result = new Date(`${date}T00:00:00Z`);
+  result.setUTCDate(result.getUTCDate() + days);
+  return result.toISOString().slice(0, 10);
+}
+
+// "2026-12-31" -> "Thu, 31 Dec". Formatted in UTC for the same reason.
+export function formatDayShort(date: string) {
+  return new Intl.DateTimeFormat("en-GB", {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+    timeZone: "UTC",
+  }).format(new Date(`${date}T00:00:00Z`));
+}

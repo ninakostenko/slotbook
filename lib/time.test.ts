@@ -1,6 +1,7 @@
 import { describe, expect, test } from "vitest";
 
 import {
+  addDays,
   dateInTimeZone,
   minutesInTimeZone,
   minutesToTime,
@@ -37,5 +38,17 @@ describe("time zone helpers", () => {
     const lateEvening = new Date("2026-07-01T22:30:00Z"); // 01:30 next day in Kyiv
     expect(dateInTimeZone(lateEvening, "Europe/Kyiv")).toBe("2026-07-02");
     expect(dateInTimeZone(lateEvening, "UTC")).toBe("2026-07-01");
+  });
+});
+
+describe("addDays", () => {
+  test("moves across month and year ends", () => {
+    expect(addDays("2026-12-31", 1)).toBe("2027-01-01");
+    expect(addDays("2026-03-01", -1)).toBe("2026-02-28");
+  });
+
+  test("is not affected by daylight saving changes", () => {
+    expect(addDays("2026-03-28", 2)).toBe("2026-03-30");
+    expect(addDays("2026-10-24", 2)).toBe("2026-10-26");
   });
 });
