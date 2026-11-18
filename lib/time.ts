@@ -96,3 +96,26 @@ export function formatDayShort(date: string) {
     timeZone: "UTC",
   }).format(new Date(`${date}T00:00:00Z`));
 }
+
+// The opposite of dateInTimeZone + minutesInTimeZone: a calendar date and minutes
+// from midnight in the business's time zone -> the exact moment in time.
+// Example: ("2026-07-01", 630, "Europe/Kyiv") is 07:30 UTC, because Kyiv is UTC+3 in summer.
+export function zonedTimeToDate(
+  date: string,
+  minutes: number,
+  timeZone: string,
+) {
+  // The wall clock we want, written as if it were UTC. It is only a starting guess.
+  const wanted = Date.parse(`${date}T00:00:00Z`) + minutes * 60_000;
+  let guess = wanted;
+  // Read the clock back in the zone and fix the guess by the difference.
+  // Twice, because the first fix can cross a daylight saving change.
+  for (let i = 0; i < 2; i++) {
+    const moment = new Date(guess);
+    const shown =
+      Date.parse(`${dateInTimeZone(moment, timeZone)}T00:00:00Z`) +
+      minutesInTimeZone(moment, timeZone) * 60_000;
+    guess += wanted - shown;
+  }
+  return new Date(guess);
+}

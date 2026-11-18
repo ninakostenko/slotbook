@@ -6,6 +6,7 @@ import {
   minutesInTimeZone,
   minutesToTime,
   timeToMinutes,
+  zonedTimeToDate,
 } from "@/lib/time";
 
 // Your minutesToTime, checked automatically.
@@ -50,5 +51,29 @@ describe("addDays", () => {
   test("is not affected by daylight saving changes", () => {
     expect(addDays("2026-03-28", 2)).toBe("2026-03-30");
     expect(addDays("2026-10-24", 2)).toBe("2026-10-26");
+  });
+});
+
+describe("zonedTimeToDate", () => {
+  test("turns a local time into the exact moment", () => {
+    // Kyiv is UTC+3 in summer and UTC+2 in winter.
+    expect(
+      zonedTimeToDate("2026-07-01", 630, "Europe/Kyiv").toISOString(),
+    ).toBe("2026-07-01T07:30:00.000Z");
+    expect(
+      zonedTimeToDate("2026-12-01", 630, "Europe/Kyiv").toISOString(),
+    ).toBe("2026-12-01T08:30:00.000Z");
+  });
+
+  test("can land on the previous UTC day", () => {
+    expect(zonedTimeToDate("2026-07-02", 60, "Europe/Kyiv").toISOString()).toBe(
+      "2026-07-01T22:00:00.000Z",
+    );
+  });
+
+  test("is the reverse of dateInTimeZone and minutesInTimeZone", () => {
+    const moment = zonedTimeToDate("2026-03-29", 600, "Europe/Kyiv");
+    expect(dateInTimeZone(moment, "Europe/Kyiv")).toBe("2026-03-29");
+    expect(minutesInTimeZone(moment, "Europe/Kyiv")).toBe(600);
   });
 });

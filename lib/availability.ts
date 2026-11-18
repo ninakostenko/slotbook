@@ -1,28 +1,28 @@
 import { prisma } from "@/lib/db";
-import { getAvailableSlots } from "@/lib/slots";
+import { getAvailableSlots, type GetAvailableSlotsInput } from "@/lib/slots";
 import { dateInTimeZone, minutesInTimeZone, todayInTimeZone } from "@/lib/time";
 
-// Free start times for one service on one day, as minutes from midnight.
-// Example: getSlotsForDay("biz1", "svc1", "2026-12-01") -> [540, 555, 570, ...]
+// Collects everything getAvailableSlots needs for one day: working hours, bookings,
+// the service length. Returns null when nothing can be booked (no service, day off).
 //
 // This function connects the database to getAvailableSlots (which knows nothing
 // about the database). Its job: collect the inputs, then call getAvailableSlots.
-export async function getSlotsForDay(
+async function loadDay(
   businessId: string,
   serviceId: string,
   date: string, // "YYYY-MM-DD"
-): Promise<number[]> {
+): Promise<GetAvailableSlotsInput | null> {
   // Look for the row with BOTH id and businessId, so one business cannot use
   // another business's service.
   const service = await prisma.service.findFirst({
     where: { id: serviceId, businessId, isActive: true },
   });
-  if (!service) return [];
+  if (!service) return null;
 
   const business = await prisma.business.findUnique({
     where: { id: businessId },
   });
-  if (!business) return [];
+  if (!business) return null;
   const timezone = business.timezone;
 
   // The date as a "day" value, the way days off are stored: midnight UTC.
@@ -32,7 +32,7 @@ export async function getSlotsForDay(
   const dayOff = await prisma.timeOff.findUnique({
     where: { businessId_date: { businessId, date: day } },
   });
-  if (dayOff) return [];
+  if (dayOff) return null;
 
   // Working hours for this weekday (0 = Sunday). No row means a closed day.
   const hoursRow = await prisma.workingHours.findUnique({
@@ -71,11 +71,71 @@ export async function getSlotsForDay(
       ? minutesInTimeZone(new Date(), timezone)
       : undefined;
 
-  return getAvailableSlots({
+  return {
     workingHours,
     durationMinutes: service.durationMinutes,
     bookings,
-    stepMinutes: 15,
+    // Times follow the length of the service: a 65-minute massage starts at 09:00, 10:05, 11:10...
+    stepMinutes: service.durationMinutes,
     earliestStart,
+  };
+}
+
+// Free start times for one service on one day.
+export async function getSlotsForDay(
+  businessId: string,
+  serviceId: string,
+  date: string,
+): Promise<number[]> {
+  const day = await loadDay(businessId, serviceId, date);
+  return day ? getAvailableSlots(day) : [];
+}
+
+// Every start time of the working day, each marked free or taken.
+// "All" means the times that would exist with no bookings at all.
+export async function getDaySlots(
+  businessId: string,
+  serviceId: string,
+  date: string,
+): Promise<{ time: number; free: boolean }[]> {
+  const day = await loadDay(businessId, serviceId, date);
+  if (!day) return [];
+  const free = new Set(getAvailableSlots(day));
+  return getAvailableSlots({ ...day, bookings: [] }).map((time) => ({
+    time,
+    free: free.has(time),
+  }));
+}
+
+// Which of the given days ("YYYY-MM-DD") the business is closed: a weekday with
+// no working hours, or a day off the owner added. Used to grey out the calendar.
+export async function getClosedDays(
+  businessId: string,
+  days: string[],
+): Promise<string[]> {
+  if (days.length === 0) return [];
+
+  const [hoursRows, timeOffRows] = await Promise.all([
+    prisma.workingHours.findMany({ where: { businessId } }),
+    prisma.timeOff.findMany({
+      where: {
+        businessId,
+        date: {
+          gte: new Date(`${days[0]}T00:00:00Z`),
+          lte: new Date(`${days[days.length - 1]}T00:00:00Z`),
+        },
+      },
+    }),
+  ]);
+
+  const workingWeekdays = new Set(hoursRows.map((row) => row.dayOfWeek));
+  // Days off are stored at midnight UTC, so the UTC date is the right one.
+  const daysOff = new Set(
+    timeOffRows.map((row) => row.date.toISOString().slice(0, 10)),
+  );
+
+  return days.filter((day) => {
+    const weekday = new Date(`${day}T00:00:00Z`).getUTCDay();
+    return !workingWeekdays.has(weekday) || daysOff.has(day);
   });
 }

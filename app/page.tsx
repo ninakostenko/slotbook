@@ -1,6 +1,6 @@
-import { ArrowRight, CalendarDays } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
+import { ArrowRight, CalendarDays } from "lucide-react";
+import Link from "next/link";
 
 export default function HomePage() {
   return (
@@ -11,7 +11,7 @@ export default function HomePage() {
         </span>
         SlotBook
       </div>
-      <h1 className="text-4xl font-semibold tracking-tight text-balance sm:text-6xl">
+      <h1 className="font-display text-5xl font-semibold tracking-tight text-balance sm:text-7xl">
         Your booking page, ready in five minutes
       </h1>
       <p className="mt-6 max-w-xl text-lg text-muted-foreground">
@@ -19,12 +19,17 @@ export default function HomePage() {
         account, no back-and-forth, no double bookings.
       </p>
       <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-        <Button size="lg">
-          Get started free
-          <ArrowRight aria-hidden="true" />
+        <Button size="lg" asChild>
+          <Link href="/sign-up">
+            Create my booking page
+            <ArrowRight aria-hidden="true" />
+          </Link>
         </Button>
-        <Button size="lg" variant="outline">
-          Try the demo
+        <Button size="lg" variant="outline" asChild>
+          <Link href="/book/glow-beauty-studio">
+            See how clients book
+            <ArrowRight aria-hidden="true" />
+          </Link>
         </Button>
       </div>
     </main>
