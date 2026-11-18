@@ -13,7 +13,7 @@ type DayCalendarProps = {
   selected: string;
   // Days in the range that are closed. They are greyed out.
   closedDays: string[];
-  // The page address without the date, for example "/book/annas-nails?service=abc".
+  // The page address without the date, for example "/book/glow-beauty-studio?service=abc".
   linkBase: string;
 };
 

@@ -26,7 +26,7 @@ export default function HomePage() {
           </Link>
         </Button>
         <Button size="lg" variant="outline" asChild>
-          <Link href="/book/annas-nails">
+          <Link href="/book/glow-beauty-studio">
             See how clients book
             <ArrowRight aria-hidden="true" />
           </Link>
