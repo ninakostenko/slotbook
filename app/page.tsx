@@ -11,7 +11,7 @@ export default function HomePage() {
         </span>
         SlotBook
       </div>
-      <h1 className="text-4xl font-semibold tracking-tight text-balance sm:text-6xl">
+      <h1 className="font-display text-5xl font-semibold tracking-tight text-balance sm:text-7xl">
         Your booking page, ready in five minutes
       </h1>
       <p className="mt-6 max-w-xl text-lg text-muted-foreground">
@@ -21,13 +21,13 @@ export default function HomePage() {
       <div className="mt-8 flex flex-col gap-3 sm:flex-row">
         <Button size="lg" asChild>
           <Link href="/sign-up">
-            Get started free
+            Create my booking page
             <ArrowRight aria-hidden="true" />
           </Link>
         </Button>
         <Button size="lg" variant="outline" asChild>
-          <Link href="/sign-up">
-            Try the demo
+          <Link href="/book/annas-nails">
+            See how clients book
             <ArrowRight aria-hidden="true" />
           </Link>
         </Button>
