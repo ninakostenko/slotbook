@@ -1,6 +1,6 @@
-import { ArrowRight, CalendarDays } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
+import { ArrowRight, CalendarDays } from "lucide-react";
+import Link from "next/link";
 
 export default function HomePage() {
   return (
@@ -19,12 +19,17 @@ export default function HomePage() {
         account, no back-and-forth, no double bookings.
       </p>
       <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-        <Button size="lg">
-          Get started free
-          <ArrowRight aria-hidden="true" />
+        <Button size="lg" asChild>
+          <Link href="/sign-up">
+            Get started free
+            <ArrowRight aria-hidden="true" />
+          </Link>
         </Button>
-        <Button size="lg" variant="outline">
-          Try the demo
+        <Button size="lg" variant="outline" asChild>
+          <Link href="/sign-up">
+            Try the demo
+            <ArrowRight aria-hidden="true" />
+          </Link>
         </Button>
       </div>
     </main>
