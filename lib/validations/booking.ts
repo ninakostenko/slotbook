@@ -24,3 +24,12 @@ export const bookingSchema = z.object({
 });
 
 export type BookingInput = z.infer<typeof bookingSchema>;
+
+// Only the two fields the client types. The form uses this one;
+// the server action uses the full bookingSchema.
+export const clientDetailsSchema = bookingSchema.pick({
+  clientName: true,
+  clientEmail: true,
+});
+
+export type ClientDetailsInput = z.infer<typeof clientDetailsSchema>;

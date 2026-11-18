@@ -1,5 +1,7 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
+
 import { getSlotsForDay } from "@/lib/availability";
 import { prisma } from "@/lib/db";
 import { zonedTimeToDate } from "@/lib/time";
@@ -47,5 +49,9 @@ export async function createBooking(
       endsAt,
     },
   });
+
+  // Tell Next.js the free times changed, so the page shows the new list at once.
+  revalidatePath(`/book/${slug}`);
+
   return { ok: true, bookingId: booking.id };
 }
