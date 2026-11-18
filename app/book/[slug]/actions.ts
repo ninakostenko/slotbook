@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { getSlotsForDay } from "@/lib/availability";
+import { isOverlapError } from "@/lib/booking-errors";
 import { prisma } from "@/lib/db";
 import { zonedTimeToDate } from "@/lib/time";
 import { bookingSchema, type BookingInput } from "@/lib/validations/booking";
@@ -39,16 +40,27 @@ export async function createBooking(
     startsAt.getTime() + service.durationMinutes * 60_000,
   );
 
-  const booking = await prisma.booking.create({
-    data: {
-      businessId: business.id,
-      serviceId,
-      clientName,
-      clientEmail,
-      startsAt,
-      endsAt,
-    },
-  });
+  // The check above can pass for two clients at the same moment. The database then
+  // refuses the second booking (the Booking_no_overlap constraint), and we say so.
+  let booking: { id: string };
+  try {
+    booking = await prisma.booking.create({
+      data: {
+        businessId: business.id,
+        serviceId,
+        clientName,
+        clientEmail,
+        startsAt,
+        endsAt,
+      },
+    });
+  } catch (error) {
+    if (isOverlapError(error)) {
+      revalidatePath(`/book/${slug}`);
+      return { ok: false, error: "This time was just taken" };
+    }
+    throw error;
+  }
 
   // Tell Next.js the free times changed, so the page shows the new list at once.
   revalidatePath(`/book/${slug}`);
