@@ -80,7 +80,7 @@ export function BookingForm({
     return (
       <p
         role="status"
-        className="mt-8 rounded-2xl border bg-card p-6 text-center"
+        className="mt-8 rounded-2xl border border-primary/30 bg-primary/10 p-6 text-center font-medium text-primary"
       >
         Booked! See you soon.
       </p>
