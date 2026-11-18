@@ -1,7 +1,8 @@
 import Link from "next/link";
 
 import { BookingForm } from "@/components/booking/booking-form";
-import { getDaySlots } from "@/lib/availability";
+import { DayCalendar } from "@/components/booking/day-calendar";
+import { getClosedDays, getDaySlots } from "@/lib/availability";
 import {
   addDays,
   formatDayShort,
@@ -31,8 +32,14 @@ export async function SlotPicker({
   const today = todayInTimeZone(business.timezone);
   const days = Array.from({ length: DAYS_AHEAD }, (_, i) => addDays(today, i));
 
-  // Only a date from the list is accepted; anything else falls back to today.
-  const date = days.find((day) => day === dateParam) ?? today;
+  // Closed days (no working hours, or a day off) cannot be picked.
+  const closedDays = await getClosedDays(business.id, days);
+  const openDays = days.filter((day) => !closedDays.includes(day));
+
+  // Only an open date from the list is accepted. Anything else falls back to the
+  // first open day (or today, when every day is closed).
+  const date =
+    openDays.find((day) => day === dateParam) ?? openDays[0] ?? today;
   const slots = await getDaySlots(business.id, service.id, date);
   const selectedTime = Number(timeParam);
 
@@ -41,24 +48,13 @@ export async function SlotPicker({
   return (
     <section className="mt-10">
       <h2 className="font-display text-2xl font-semibold">Choose a day</h2>
-      <ul className="mt-3 flex gap-2 overflow-x-auto pb-2">
-        {days.map((day) => (
-          <li key={day} className="shrink-0">
-            <Link
-              href={`${linkBase}&date=${day}`}
-              scroll={false}
-              aria-current={day === date ? "date" : undefined}
-              className={
-                day === date
-                  ? "block rounded-full bg-primary px-3 py-2 text-sm text-primary-foreground"
-                  : "block rounded-full border px-3 py-2 text-sm hover:bg-muted"
-              }
-            >
-              {formatDayShort(day)}
-            </Link>
-          </li>
-        ))}
-      </ul>
+      <DayCalendar
+        today={today}
+        lastDay={days[days.length - 1] ?? today}
+        selected={date}
+        closedDays={closedDays}
+        linkBase={linkBase}
+      />
 
       <h2 className="font-display mt-8 text-2xl font-semibold">
         Choose a time
@@ -76,11 +72,11 @@ export async function SlotPicker({
                 aria-current={time === selectedTime ? "true" : undefined}
                 title={free ? undefined : "Already taken"}
                 className={
-                  time === selectedTime
-                    ? "block rounded-full bg-primary px-3 py-2 text-center text-sm text-primary-foreground"
-                    : free
-                      ? "block rounded-full border px-3 py-2 text-center text-sm hover:bg-muted"
-                      : "block rounded-full bg-muted px-3 py-2 text-center text-sm text-muted-foreground line-through"
+                  !free
+                    ? "block rounded-full bg-muted px-3 py-2 text-center text-sm text-muted-foreground line-through"
+                    : time === selectedTime
+                      ? "block rounded-full bg-primary px-3 py-2 text-center text-sm text-primary-foreground"
+                      : "block rounded-full border px-3 py-2 text-center text-sm hover:bg-muted"
                 }
               >
                 {minutesToTime(time)}

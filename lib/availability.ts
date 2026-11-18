@@ -106,3 +106,36 @@ export async function getDaySlots(
     free: free.has(time),
   }));
 }
+
+// Which of the given days ("YYYY-MM-DD") the business is closed: a weekday with
+// no working hours, or a day off the owner added. Used to grey out the calendar.
+export async function getClosedDays(
+  businessId: string,
+  days: string[],
+): Promise<string[]> {
+  if (days.length === 0) return [];
+
+  const [hoursRows, timeOffRows] = await Promise.all([
+    prisma.workingHours.findMany({ where: { businessId } }),
+    prisma.timeOff.findMany({
+      where: {
+        businessId,
+        date: {
+          gte: new Date(`${days[0]}T00:00:00Z`),
+          lte: new Date(`${days[days.length - 1]}T00:00:00Z`),
+        },
+      },
+    }),
+  ]);
+
+  const workingWeekdays = new Set(hoursRows.map((row) => row.dayOfWeek));
+  // Days off are stored at midnight UTC, so the UTC date is the right one.
+  const daysOff = new Set(
+    timeOffRows.map((row) => row.date.toISOString().slice(0, 10)),
+  );
+
+  return days.filter((day) => {
+    const weekday = new Date(`${day}T00:00:00Z`).getUTCDay();
+    return !workingWeekdays.has(weekday) || daysOff.has(day);
+  });
+}
