@@ -119,3 +119,13 @@ export function zonedTimeToDate(
   }
   return new Date(guess);
 }
+
+// A moment in time -> the clock time there, as "10:30" (24 hours, in the business's time zone).
+export function formatTimeInZone(moment: Date, timeZone: string) {
+  return minutesToTime(minutesInTimeZone(moment, timeZone));
+}
+
+// A moment in time -> the day there, as "Thu, 3 Dec". The weekday depends on the time zone too.
+export function formatDayInZone(moment: Date, timeZone: string) {
+  return formatDayShort(dateInTimeZone(moment, timeZone));
+}
