@@ -9,7 +9,8 @@ import { zonedTimeToDate } from "@/lib/time";
 import { bookingSchema, type BookingInput } from "@/lib/validations/booking";
 
 export type CreateBookingResult =
-  { ok: true; bookingId: string } | { ok: false; error: string };
+  | { ok: true; bookingId: string; cancelToken: string }
+  | { ok: false; error: string };
 
 // A Server Action is a public endpoint: anyone can call it with any data.
 // So it checks everything itself, like completeOnboarding and updateService do.
@@ -42,7 +43,7 @@ export async function createBooking(
 
   // The check above can pass for two clients at the same moment. The database then
   // refuses the second booking (the Booking_no_overlap constraint), and we say so.
-  let booking: { id: string };
+  let booking: { id: string; cancelToken: string };
   try {
     booking = await prisma.booking.create({
       data: {
@@ -65,5 +66,9 @@ export async function createBooking(
   // Tell Next.js the free times changed, so the page shows the new list at once.
   revalidatePath(`/book/${slug}`);
 
-  return { ok: true, bookingId: booking.id };
+  return {
+    ok: true,
+    bookingId: booking.id,
+    cancelToken: booking.cancelToken,
+  };
 }

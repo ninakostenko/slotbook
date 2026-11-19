@@ -3,6 +3,8 @@ import { describe, expect, test } from "vitest";
 import {
   addDays,
   dateInTimeZone,
+  formatDayInZone,
+  formatTimeInZone,
   minutesInTimeZone,
   minutesToTime,
   timeToMinutes,
@@ -75,5 +77,20 @@ describe("zonedTimeToDate", () => {
     const moment = zonedTimeToDate("2026-03-29", 600, "Europe/Kyiv");
     expect(dateInTimeZone(moment, "Europe/Kyiv")).toBe("2026-03-29");
     expect(minutesInTimeZone(moment, "Europe/Kyiv")).toBe(600);
+  });
+});
+
+describe("formatting a moment in a time zone", () => {
+  test("formatTimeInZone shows the clock time there", () => {
+    const moment = new Date("2026-07-01T07:30:00Z");
+    expect(formatTimeInZone(moment, "Europe/Kyiv")).toBe("10:30");
+    expect(formatTimeInZone(moment, "UTC")).toBe("07:30");
+  });
+
+  test("formatDayInZone uses the day there, not the UTC day", () => {
+    const lateEvening = new Date("2026-07-01T22:30:00Z"); // 01:30 on 2 July in Kyiv
+    // The comma after the weekday depends on the Node version, so only the day is checked.
+    expect(formatDayInZone(lateEvening, "Europe/Kyiv")).toMatch(/Thu,? 2 Jul/);
+    expect(formatDayInZone(lateEvening, "UTC")).toMatch(/Wed,? 1 Jul/);
   });
 });

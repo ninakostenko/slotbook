@@ -15,6 +15,7 @@ import {
 } from "@/lib/validations/booking";
 import { zodResolver } from "@hookform/resolvers/zod";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
@@ -38,6 +39,7 @@ export function BookingForm({
 }: BookingFormProps) {
   const [serverError, setServerError] = useState<string | null>(null);
   const [bookedId, setBookedId] = useState<string | null>(null);
+  const router = useRouter();
 
   const {
     register,
@@ -62,6 +64,8 @@ export function BookingForm({
       return;
     }
     setBookedId(result.bookingId);
+    // The confirmation page has the details and the link to cancel.
+    router.push(`/booking/${result.cancelToken}`);
   }
 
   if (!bookedId && !available) {
