@@ -69,9 +69,13 @@ Days off (`TimeOff.date`, `@db.Date`) travel as `"YYYY-MM-DD"` strings (`timeOff
 
 `/dashboard/services` lists the business's services, with create and edit dialogs in `components/services/` and actions in `app/(dashboard)/dashboard/services/actions.ts`. Each action follows the same order: get the business from the DAL, `safeParse` the input, write, then `revalidatePath`. Updates use `updateMany` with `where: { id, businessId }` and treat `count === 0` as not found, so an owner cannot change another business's rows by sending its id. Services are hidden with `isActive`, never deleted, because bookings reference them. The active switch uses `useOptimistic` inside `startTransition`.
 
-## Planned, not yet installed
+## Bookings, dashboard and demo
 
-`.env.example` also lists a `CRON_SECRET` that protects a daily demo reset route.
+A client books on `/book/[slug]` (`createBooking` in `app/book/[slug]/actions.ts`), then lands on `/booking/[token]`, a private page found by the booking's `cancelToken`, where they can cancel (`cancelBookingByToken`). Double booking is blocked twice: `getSlotsForDay` hides taken times, and the `Booking_no_overlap` exclusion constraint (a hand-written migration) makes the database refuse an overlap. `isOverlapError` in `lib/booking-errors.ts` recognises that error, and `createBooking` answers "This time was just taken". The owner sees bookings in `/dashboard/bookings` and cancels them with `cancelBooking`. Slot start times follow the length of the service: a 65-minute service starts every 65 minutes.
+
+The whole app uses one rose palette and the serif `font-display` for headings. The tokens are in `app/globals.css`.
+
+**Demo.** The landing page has a button that calls the `startDemo` Server Action (`app/demo/actions.ts`). It signs in as `demo@slotbook.app` with `DEMO_PASSWORD` and redirects to `/dashboard`. `resetDemo` in `lib/demo.ts` rebuilds the demo business "Lumi Beauty Studio" (`/book/demo-studio`) from the sample data in `lib/demo-data.ts`. It only touches the business owned by the demo e-mail, because the database is shared with real data. Vercel Cron calls `GET /api/demo/reset` daily (`vercel.json`) with `Authorization: Bearer <CRON_SECRET>`. Both `DEMO_PASSWORD` and `CRON_SECRET` must also be set on Vercel, and the demo password must be the same value everywhere.
 
 ## Figma reference
 

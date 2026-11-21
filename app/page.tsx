@@ -1,3 +1,4 @@
+import { DemoButton } from "@/components/landing/demo-button";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, CalendarDays } from "lucide-react";
 import Link from "next/link";
@@ -26,12 +27,15 @@ export default function HomePage() {
           </Link>
         </Button>
         <Button size="lg" variant="outline" asChild>
-          <Link href="/book/glow-beauty-studio">
+          <Link href="/book/demo-studio">
             See how clients book
             <ArrowRight aria-hidden="true" />
           </Link>
         </Button>
       </div>
+      <p className="mt-6 text-sm text-muted-foreground">
+        Just looking? You can also <DemoButton /> with sample data.
+      </p>
     </main>
   );
 }

@@ -1,0 +1,27 @@
+"use client";
+
+import { Loader2 } from "lucide-react";
+import { useFormStatus } from "react-dom";
+
+import { startDemo } from "@/app/demo/actions";
+import { Button } from "@/components/ui/button";
+
+function SubmitButton() {
+  const { pending } = useFormStatus();
+
+  return (
+    <Button type="submit" variant="link" disabled={pending} className="px-1">
+      {pending && <Loader2 className="animate-spin" aria-hidden="true" />}
+      {pending ? "Opening the demo…" : "explore the owner dashboard"}
+    </Button>
+  );
+}
+
+// A form with one button. The server action signs in as the demo owner and redirects.
+export function DemoButton() {
+  return (
+    <form action={startDemo} className="inline">
+      <SubmitButton />
+    </form>
+  );
+}
