@@ -6,6 +6,12 @@ Online booking for solo service providers (nail artists, massage therapists, bar
 
 > This is a portfolio project, built in four weeks by one developer: [Nina Kostenko](https://github.com/ninakostenko).
 
+## Screenshots
+
+![The landing page](docs/screenshots/landing.png)
+
+![The booking page: a service, a calendar and the times of the chosen day, with a taken time struck through](docs/screenshots/booking.png)
+
 ## What it does
 
 **For clients** (`/book/<link>`)
