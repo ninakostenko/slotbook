@@ -21,7 +21,8 @@ const display = Cormorant_Garamond({
 
 export const metadata: Metadata = {
   title: "SlotBook",
-  description: "Online booking for independent professionals.",
+  description:
+    "Online booking for solo service providers: share one link, and clients book a free time without an account.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
