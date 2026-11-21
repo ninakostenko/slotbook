@@ -1,12 +1,15 @@
+import { defaultLocale, intlLocales, type Locale } from "@/lib/i18n/config";
+
 // Shown Monday first. dayOfWeek follows JavaScript: 0 = Sunday.
+// The names of the days are in the messages: t(`weekdays.${dayOfWeek}`).
 export const weekDays = [
-  { dayOfWeek: 1, label: "Monday" },
-  { dayOfWeek: 2, label: "Tuesday" },
-  { dayOfWeek: 3, label: "Wednesday" },
-  { dayOfWeek: 4, label: "Thursday" },
-  { dayOfWeek: 5, label: "Friday" },
-  { dayOfWeek: 6, label: "Saturday" },
-  { dayOfWeek: 0, label: "Sunday" },
+  { dayOfWeek: 1 },
+  { dayOfWeek: 2 },
+  { dayOfWeek: 3 },
+  { dayOfWeek: 4 },
+  { dayOfWeek: 5 },
+  { dayOfWeek: 6 },
+  { dayOfWeek: 0 },
 ];
 
 export function timeToMinutes(time: string) {
@@ -48,8 +51,8 @@ export function todayInTimeZone(timeZone: string) {
 }
 
 // A day stored at midnight UTC -> "Thu, 31 Dec 2026". Formatted in UTC so it never shifts a day.
-export function formatDay(date: Date) {
-  return new Intl.DateTimeFormat("en-GB", {
+export function formatDay(date: Date, locale: Locale = defaultLocale) {
+  return new Intl.DateTimeFormat(intlLocales[locale], {
     weekday: "short",
     day: "numeric",
     month: "short",
@@ -88,8 +91,8 @@ export function addDays(date: string, days: number) {
 }
 
 // "2026-12-31" -> "Thu, 31 Dec". Formatted in UTC for the same reason.
-export function formatDayShort(date: string) {
-  return new Intl.DateTimeFormat("en-GB", {
+export function formatDayShort(date: string, locale: Locale = defaultLocale) {
+  return new Intl.DateTimeFormat(intlLocales[locale], {
     weekday: "short",
     day: "numeric",
     month: "short",
@@ -126,6 +129,10 @@ export function formatTimeInZone(moment: Date, timeZone: string) {
 }
 
 // A moment in time -> the day there, as "Thu, 3 Dec". The weekday depends on the time zone too.
-export function formatDayInZone(moment: Date, timeZone: string) {
-  return formatDayShort(dateInTimeZone(moment, timeZone));
+export function formatDayInZone(
+  moment: Date,
+  timeZone: string,
+  locale: Locale = defaultLocale,
+) {
+  return formatDayShort(dateInTimeZone(moment, timeZone), locale);
 }

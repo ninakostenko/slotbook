@@ -1,20 +1,22 @@
 import { z } from "zod";
 
-export const signUpSchema = z.object({
-  name: z.string().trim().min(2, "Name must be at least 2 characters"),
+// The messages are keys of lib/i18n/messages. FieldError translates them when it shows them.
 
-  email: z.string().trim().email("Enter a valid email address"),
+export const signUpSchema = z.object({
+  name: z.string().trim().min(2, "validation.nameMin"),
+
+  email: z.string().trim().email("validation.email"),
   password: z
     .string()
-    .min(8, "Password must be at least 8 characters")
-    .max(128, "Password must be at most 128 characters"),
+    .min(8, "validation.passwordMin")
+    .max(128, "validation.passwordMax"),
 });
 
 export type SignUpInput = z.infer<typeof signUpSchema>;
 
 export const signInSchema = z.object({
-  email: z.string().trim().email("Enter a valid email address"),
-  password: z.string().min(1, "Enter your password"),
+  email: z.string().trim().email("validation.email"),
+  password: z.string().min(1, "validation.passwordRequired"),
 });
 
 export type SignInInput = z.infer<typeof signInSchema>;

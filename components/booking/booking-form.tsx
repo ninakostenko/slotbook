@@ -1,6 +1,7 @@
 "use client";
 
-import { createBooking } from "@/app/book/[slug]/actions";
+import { createBooking } from "@/app/[locale]/book/[slug]/actions";
+import { useT } from "@/components/i18n/i18n-provider";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -37,6 +38,7 @@ export function BookingForm({
   available,
   summary,
 }: BookingFormProps) {
+  const t = useT();
   const [serverError, setServerError] = useState<string | null>(null);
   const [bookedId, setBookedId] = useState<string | null>(null);
   const router = useRouter();
@@ -60,7 +62,7 @@ export function BookingForm({
       time,
     });
     if (!result.ok) {
-      setServerError(result.error);
+      setServerError(t(result.error));
       return;
     }
     setBookedId(result.bookingId);
@@ -75,7 +77,7 @@ export function BookingForm({
         role="status"
         className="mt-6 scroll-mt-8 rounded-2xl border bg-card p-6 text-center"
       >
-        This time is no longer available. Please choose another one.
+        {t("book.unavailable")}
       </p>
     );
   }
@@ -86,7 +88,7 @@ export function BookingForm({
         role="status"
         className="mt-8 rounded-2xl border border-primary/30 bg-primary/10 p-6 text-center font-medium text-primary"
       >
-        Booked! See you soon.
+        {t("book.booked")}
       </p>
     );
   }
@@ -99,12 +101,12 @@ export function BookingForm({
       noValidate
     >
       <h2 className="font-display text-2xl font-semibold">
-        Enter your details to book
+        {t("book.enterDetails")}
       </h2>
       <p className="mt-1 text-sm text-muted-foreground">{summary}</p>
       <FieldGroup className="mt-3">
         <Field data-invalid={!!errors.clientName}>
-          <FieldLabel htmlFor="clientName">Name</FieldLabel>
+          <FieldLabel htmlFor="clientName">{t("book.name")}</FieldLabel>
           <Input
             id="clientName"
             autoComplete="name"
@@ -114,7 +116,7 @@ export function BookingForm({
           <FieldError errors={[errors.clientName]} />
         </Field>
         <Field data-invalid={!!errors.clientEmail}>
-          <FieldLabel htmlFor="clientEmail">Email</FieldLabel>
+          <FieldLabel htmlFor="clientEmail">{t("book.email")}</FieldLabel>
           <Input
             id="clientEmail"
             type="email"
@@ -131,7 +133,7 @@ export function BookingForm({
           </p>
         )}
         <Button type="submit" className="w-full" disabled={isSubmitting}>
-          {isSubmitting ? "Booking…" : "Book"}
+          {isSubmitting ? t("book.booking") : t("book.book")}
         </Button>
       </FieldGroup>
     </form>

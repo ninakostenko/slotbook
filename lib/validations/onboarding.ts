@@ -1,22 +1,21 @@
 import { z } from "zod";
 
+// The messages are keys of lib/i18n/messages. FieldError translates them when it shows them.
+
 export const businessSchema = z.object({
   name: z
     .string()
     .trim()
-    .min(2, "Business name must be at least 2 characters")
-    .max(60, "Business name must be at most 60 characters"),
+    .min(2, "validation.businessNameMin")
+    .max(60, "validation.businessNameMax"),
 
   slug: z
     .string()
     .trim()
     .toLowerCase()
-    .min(3, "Link must be at least 3 characters")
-    .max(40, "Link must be at most 40 characters long")
-    .regex(
-      /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
-      "Use lowercase letters, numbers and single hyphens, like anna-studio",
-    ),
+    .min(3, "validation.linkMin")
+    .max(40, "validation.linkMax")
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "validation.linkFormat"),
 });
 
 export type BusinessInput = z.infer<typeof businessSchema>;
@@ -25,18 +24,18 @@ export const serviceSchema = z.object({
   name: z
     .string()
     .trim()
-    .min(2, "Service name must be at least 2 characters")
-    .max(60, "Service name must be at most 60 characters"),
+    .min(2, "validation.serviceNameMin")
+    .max(60, "validation.serviceNameMax"),
   // Number inputs give NaN when empty, so the custom `error` covers that case too.
   durationMinutes: z
-    .number({ error: "Enter a duration in minutes" })
-    .int("Use whole minutes")
-    .min(5, "A service takes at least 5 minutes")
-    .max(480, "A service takes at most 8 hours"),
+    .number({ error: "validation.durationRequired" })
+    .int("validation.durationWhole")
+    .min(5, "validation.durationMin")
+    .max(480, "validation.durationMax"),
   price: z
-    .number({ error: "Enter a price" })
-    .min(0, "Price cannot be negative")
-    .max(100_000, "Price is too high"),
+    .number({ error: "validation.priceRequired" })
+    .min(0, "validation.priceNegative")
+    .max(100_000, "validation.priceHigh"),
 });
 
 export type ServiceInput = z.infer<typeof serviceSchema>;
@@ -44,7 +43,7 @@ export type ServiceInput = z.infer<typeof serviceSchema>;
 // "09:00" style time, 00:00 to 23:59.
 const time = z
   .string()
-  .regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Use a time like 09:00");
+  .regex(/^([01]\d|2[0-3]):[0-5]\d$/, "validation.timeFormat");
 
 export const dayScheduleSchema = z
   .object({
@@ -55,7 +54,7 @@ export const dayScheduleSchema = z
   })
   // "09:00" < "18:00" works as plain string comparison because both have the same format.
   .refine((day) => !day.enabled || day.start < day.end, {
-    message: "End time must be after start time",
+    message: "validation.endAfterStart",
     path: ["end"],
   });
 
@@ -64,7 +63,7 @@ export const scheduleSchema = z.object({
     .array(dayScheduleSchema)
     .length(7)
     .refine((days) => days.some((day) => day.enabled), {
-      message: "Choose at least one working day",
+      message: "validation.chooseWorkingDay",
     }),
 });
 
@@ -81,7 +80,7 @@ export type OnboardingInput = z.infer<typeof onboardingSchema>;
 
 // A whole day off, as "YYYY-MM-DD" (the format of <input type="date"> and of the calendar).
 export const timeOffSchema = z.object({
-  date: z.iso.date("Pick a date"),
+  date: z.iso.date("validation.pickDate"),
 });
 
 export type TimeOffInput = z.infer<typeof timeOffSchema>;

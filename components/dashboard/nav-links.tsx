@@ -10,14 +10,31 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { useT } from "@/components/i18n/i18n-provider";
 import { cn } from "@/lib/utils";
 
 const navItems = [
-  { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
-  { href: "/dashboard/bookings", label: "Bookings", icon: CalendarDays },
-  { href: "/dashboard/services", label: "Services", icon: Scissors },
-  { href: "/dashboard/schedule", label: "Schedule", icon: Clock },
-  { href: "/dashboard/settings", label: "Settings", icon: Settings },
+  {
+    href: "/dashboard",
+    label: "dashboard.nav.overview",
+    icon: LayoutDashboard,
+  },
+  {
+    href: "/dashboard/bookings",
+    label: "dashboard.nav.bookings",
+    icon: CalendarDays,
+  },
+  {
+    href: "/dashboard/services",
+    label: "dashboard.nav.services",
+    icon: Scissors,
+  },
+  { href: "/dashboard/schedule", label: "dashboard.nav.schedule", icon: Clock },
+  {
+    href: "/dashboard/settings",
+    label: "dashboard.nav.settings",
+    icon: Settings,
+  },
 ];
 
 function isActive(pathname: string, href: string) {
@@ -28,9 +45,10 @@ function isActive(pathname: string, href: string) {
 // Sidebar on desktop.
 export function SidebarNav() {
   const pathname = usePathname();
+  const t = useT();
 
   return (
-    <nav aria-label="Main" className="flex flex-col gap-1">
+    <nav aria-label={t("dashboard.nav.main")} className="flex flex-col gap-1">
       {navItems.map(({ href, label, icon: Icon }) => {
         const active = isActive(pathname, href);
         return (
@@ -44,7 +62,7 @@ export function SidebarNav() {
             )}
           >
             <Icon className="size-4" aria-hidden="true" />
-            {label}
+            {t(label)}
           </Link>
         );
       })}
@@ -55,10 +73,11 @@ export function SidebarNav() {
 // Bottom bar on phones.
 export function BottomNav() {
   const pathname = usePathname();
+  const t = useT();
 
   return (
     <nav
-      aria-label="Main"
+      aria-label={t("dashboard.nav.main")}
       className="fixed inset-x-0 bottom-0 z-10 grid grid-cols-5 border-t bg-background md:hidden"
     >
       {navItems.map(({ href, label, icon: Icon }) => {
@@ -74,7 +93,7 @@ export function BottomNav() {
             )}
           >
             <Icon className="size-5" aria-hidden="true" />
-            {label}
+            {t(label)}
           </Link>
         );
       })}

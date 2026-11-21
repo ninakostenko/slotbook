@@ -1,9 +1,10 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { enUS } from "react-day-picker/locale";
 
+import { useLocale } from "@/components/i18n/i18n-provider";
 import { Calendar } from "@/components/ui/calendar";
+import { calendarLocales } from "@/lib/i18n/calendar-locales";
 import { toDateString } from "@/lib/time";
 
 type DayCalendarProps = {
@@ -33,6 +34,7 @@ export function DayCalendar({
   linkBase,
 }: DayCalendarProps) {
   const router = useRouter();
+  const locale = useLocale();
   const first = toLocalDate(today);
   const last = toLocalDate(lastDay);
 
@@ -57,7 +59,7 @@ export function DayCalendar({
         startMonth={first}
         endMonth={last}
         showOutsideDays={false}
-        locale={enUS}
+        locale={calendarLocales[locale]}
         weekStartsOn={1}
         className="[--cell-size:--spacing(10)]"
       />

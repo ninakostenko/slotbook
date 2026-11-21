@@ -5,7 +5,8 @@ import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 
-import { updateSchedule } from "@/app/(dashboard)/dashboard/schedule/actions";
+import { updateSchedule } from "@/app/[locale]/(dashboard)/dashboard/schedule/actions";
+import { useT } from "@/components/i18n/i18n-provider";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { TimeSelect } from "@/components/schedule/time-select";
@@ -20,6 +21,7 @@ type ScheduleFormProps = {
 };
 
 export function ScheduleForm({ days: savedDays }: ScheduleFormProps) {
+  const t = useT();
   const [serverError, setServerError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
 
@@ -39,7 +41,7 @@ export function ScheduleForm({ days: savedDays }: ScheduleFormProps) {
     setSaved(false);
     const result = await updateSchedule(values);
     if (result?.error) {
-      setServerError(result.error);
+      setServerError(t(result.error));
       return;
     }
     setSaved(true);
@@ -54,7 +56,8 @@ export function ScheduleForm({ days: savedDays }: ScheduleFormProps) {
       className="mt-8 max-w-xl"
     >
       <div className="flex flex-col gap-1 rounded-lg border px-4">
-        {weekDays.map(({ label }, index) => {
+        {weekDays.map(({ dayOfWeek }, index) => {
+          const label = t(`weekdays.${dayOfWeek}`);
           const enabled = days[index]?.enabled ?? false;
           const endError = errors.days?.[index]?.end;
           return (
@@ -87,7 +90,7 @@ export function ScheduleForm({ days: savedDays }: ScheduleFormProps) {
                       <TimeSelect
                         value={field.value}
                         onChange={field.onChange}
-                        aria-label={`${label} start`}
+                        aria-label={t("onboarding.hours.start", { day: label })}
                       />
                     )}
                   />
@@ -99,19 +102,21 @@ export function ScheduleForm({ days: savedDays }: ScheduleFormProps) {
                       <TimeSelect
                         value={field.value}
                         onChange={field.onChange}
-                        aria-label={`${label} end`}
+                        aria-label={t("onboarding.hours.end", { day: label })}
                         invalid={!!endError}
                       />
                     )}
                   />
                 </div>
               ) : (
-                <span className="text-sm text-muted-foreground">Closed</span>
+                <span className="text-sm text-muted-foreground">
+                  {t("common.closed")}
+                </span>
               )}
 
               {endError && (
                 <p role="alert" className="w-full text-sm text-destructive">
-                  {endError.message}
+                  {t(endError.message ?? "")}
                 </p>
               )}
             </div>
@@ -121,7 +126,7 @@ export function ScheduleForm({ days: savedDays }: ScheduleFormProps) {
 
       {daysError && (
         <p role="alert" className="mt-2 text-sm text-destructive">
-          {daysError}
+          {t(daysError)}
         </p>
       )}
       {serverError && (
@@ -135,10 +140,10 @@ export function ScheduleForm({ days: savedDays }: ScheduleFormProps) {
           {isSubmitting && (
             <Loader2 className="animate-spin" aria-hidden="true" />
           )}
-          {isSubmitting ? "Saving…" : "Save schedule"}
+          {isSubmitting ? t("common.saving") : t("schedule.save")}
         </Button>
         {saved && (
-          <p className="text-sm text-muted-foreground">Schedule saved</p>
+          <p className="text-sm text-muted-foreground">{t("schedule.saved")}</p>
         )}
       </div>
     </form>

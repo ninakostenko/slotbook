@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
+import { useT } from "@/components/i18n/i18n-provider";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -28,6 +29,7 @@ import { signUpSchema, type SignUpInput } from "@/lib/validations/auth";
 
 export function SignUpForm() {
   const router = useRouter();
+  const t = useT();
   // Errors from the server, such as "email already taken". Field errors come from Zod.
   const [serverError, setServerError] = useState<string | null>(null);
 
@@ -46,8 +48,12 @@ export function SignUpForm() {
     const { error } = await authClient.signUp.email(values);
 
     if (error) {
+      const key = `auth.codes.${error.code}`;
+      const translated = t(key);
       setServerError(
-        error.message ?? "Something went wrong. Please try again.",
+        translated !== key
+          ? translated
+          : (error.message ?? t("errors.generic")),
       );
       return;
     }
@@ -59,17 +65,15 @@ export function SignUpForm() {
   return (
     <Card className="w-full max-w-sm">
       <CardHeader>
-        <CardTitle>Create your account</CardTitle>
-        <CardDescription>
-          Set up your booking page in a few minutes.
-        </CardDescription>
+        <CardTitle>{t("auth.signUp.title")}</CardTitle>
+        <CardDescription>{t("auth.signUp.description")}</CardDescription>
       </CardHeader>
 
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
           <FieldGroup>
             <Field data-invalid={!!errors.name}>
-              <FieldLabel htmlFor="name">Name</FieldLabel>
+              <FieldLabel htmlFor="name">{t("auth.signUp.name")}</FieldLabel>
               <Input
                 id="name"
                 autoComplete="name"
@@ -80,7 +84,7 @@ export function SignUpForm() {
             </Field>
 
             <Field data-invalid={!!errors.email}>
-              <FieldLabel htmlFor="email">Email</FieldLabel>
+              <FieldLabel htmlFor="email">{t("auth.signUp.email")}</FieldLabel>
               <Input
                 id="email"
                 type="email"
@@ -92,7 +96,9 @@ export function SignUpForm() {
             </Field>
 
             <Field data-invalid={!!errors.password}>
-              <FieldLabel htmlFor="password">Password</FieldLabel>
+              <FieldLabel htmlFor="password">
+                {t("auth.signUp.password")}
+              </FieldLabel>
               <Input
                 id="password"
                 type="password"
@@ -113,16 +119,18 @@ export function SignUpForm() {
               {isSubmitting && (
                 <Loader2 className="animate-spin" aria-hidden="true" />
               )}
-              {isSubmitting ? "Creating account…" : "Create account"}
+              {isSubmitting
+                ? t("auth.signUp.submitting")
+                : t("auth.signUp.submit")}
             </Button>
           </FieldGroup>
         </form>
       </CardContent>
 
       <CardFooter className="justify-center text-sm text-muted-foreground">
-        Already have an account?&nbsp;
+        {t("auth.signUp.haveAccount")}&nbsp;
         <Link href="/sign-in" className="text-primary hover:underline">
-          Sign in
+          {t("auth.signUp.signIn")}
         </Link>
       </CardFooter>
     </Card>

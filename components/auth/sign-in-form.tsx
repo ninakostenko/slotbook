@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
+import { useT } from "@/components/i18n/i18n-provider";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -28,6 +29,7 @@ import { signInSchema, type SignInInput } from "@/lib/validations/auth";
 
 export function SignInForm() {
   const router = useRouter();
+  const t = useT();
   const [serverError, setServerError] = useState<string | null>(null);
 
   const {
@@ -45,8 +47,12 @@ export function SignInForm() {
     const { error } = await authClient.signIn.email(values);
 
     if (error) {
+      const key = `auth.codes.${error.code}`;
+      const translated = t(key);
       setServerError(
-        error.message ?? "Something went wrong. Please try again.",
+        translated !== key
+          ? translated
+          : (error.message ?? t("errors.generic")),
       );
       return;
     }
@@ -58,17 +64,15 @@ export function SignInForm() {
   return (
     <Card className="w-full max-w-sm">
       <CardHeader>
-        <CardTitle>Sign in to your account</CardTitle>
-        <CardDescription>
-          Enter your email and password to access your account.
-        </CardDescription>
+        <CardTitle>{t("auth.signIn.title")}</CardTitle>
+        <CardDescription>{t("auth.signIn.description")}</CardDescription>
       </CardHeader>
 
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
           <FieldGroup>
             <Field data-invalid={!!errors.email}>
-              <FieldLabel htmlFor="email">Email</FieldLabel>
+              <FieldLabel htmlFor="email">{t("auth.signIn.email")}</FieldLabel>
               <Input
                 id="email"
                 type="email"
@@ -80,7 +84,9 @@ export function SignInForm() {
             </Field>
 
             <Field data-invalid={!!errors.password}>
-              <FieldLabel htmlFor="password">Password</FieldLabel>
+              <FieldLabel htmlFor="password">
+                {t("auth.signIn.password")}
+              </FieldLabel>
               <Input
                 id="password"
                 type="password"
@@ -101,16 +107,18 @@ export function SignInForm() {
               {isSubmitting && (
                 <Loader2 className="animate-spin" aria-hidden="true" />
               )}
-              {isSubmitting ? "Signing in…" : "Sign in"}
+              {isSubmitting
+                ? t("auth.signIn.submitting")
+                : t("auth.signIn.submit")}
             </Button>
           </FieldGroup>
         </form>
       </CardContent>
 
       <CardFooter className="justify-center text-sm text-muted-foreground">
-        Don&apos;t have an account?&nbsp;
+        {t("auth.signIn.noAccount")}&nbsp;
         <Link href="/sign-up" className="text-primary hover:underline">
-          Create one
+          {t("auth.signIn.createOne")}
         </Link>
       </CardFooter>
     </Card>

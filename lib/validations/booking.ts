@@ -1,26 +1,28 @@
 import { z } from "zod";
 
+// The messages are keys of lib/i18n/messages. FieldError translates them when it shows them.
+
 export const bookingSchema = z.object({
   clientName: z
     .string()
     .trim()
-    .min(2, "Name must be at least 2 characters")
-    .max(60, "Name must be at most 60 characters"),
+    .min(2, "validation.nameMin")
+    .max(60, "validation.nameMax"),
 
-  clientEmail: z.email("Enter a valid email"),
+  clientEmail: z.email("validation.email"),
 
   // The next three come from the page address, not from what the client types.
-  serviceId: z.string().min(1, "Pick a service"),
+  serviceId: z.string().min(1, "validation.pickService"),
 
   // A day as "YYYY-MM-DD".
-  date: z.iso.date("Pick a date"),
+  date: z.iso.date("validation.pickDate"),
 
   // The start time in minutes from midnight: 540 means 09:00.
   time: z
-    .number("Pick a time")
-    .int("Pick a time")
-    .min(0, "Pick a time")
-    .max(1439, "Pick a time"),
+    .number("validation.pickTime")
+    .int("validation.pickTime")
+    .min(0, "validation.pickTime")
+    .max(1439, "validation.pickTime"),
 });
 
 export type BookingInput = z.infer<typeof bookingSchema>;

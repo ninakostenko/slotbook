@@ -3,6 +3,8 @@ import Link from "next/link";
 import { BookingForm } from "@/components/booking/booking-form";
 import { DayCalendar } from "@/components/booking/day-calendar";
 import { getClosedDays, getDaySlots } from "@/lib/availability";
+import type { Locale } from "@/lib/i18n/config";
+import { getT } from "@/lib/i18n/translate";
 import {
   addDays,
   formatDayShort,
@@ -13,6 +15,7 @@ import {
 const DAYS_AHEAD = 14;
 
 type SlotPickerProps = {
+  locale: Locale;
   business: { id: string; slug: string; timezone: string };
   service: { id: string; name: string };
   // Both come from the URL, so they are untrusted: they are checked below.
@@ -23,11 +26,13 @@ type SlotPickerProps = {
 // Shows the next 14 days and the start times of the chosen day.
 // The choice lives in the URL: ?service=...&date=2026-12-01&time=540
 export async function SlotPicker({
+  locale,
   business,
   service,
   dateParam,
   timeParam,
 }: SlotPickerProps) {
+  const t = getT(locale);
   // "Today" is the date in the business's time zone, not on the server.
   const today = todayInTimeZone(business.timezone);
   const days = Array.from({ length: DAYS_AHEAD }, (_, i) => addDays(today, i));
@@ -47,7 +52,9 @@ export async function SlotPicker({
 
   return (
     <section className="mt-10">
-      <h2 className="font-display text-2xl font-semibold">Choose a day</h2>
+      <h2 className="font-display text-2xl font-semibold">
+        {t("book.chooseDay")}
+      </h2>
       <DayCalendar
         today={today}
         lastDay={days[days.length - 1] ?? today}
@@ -57,12 +64,10 @@ export async function SlotPicker({
       />
 
       <h2 className="font-display mt-8 text-2xl font-semibold">
-        Choose a time
+        {t("book.chooseTime")}
       </h2>
       {slots.length === 0 ? (
-        <p className="mt-3 text-muted-foreground">
-          Closed on this day. Try another day.
-        </p>
+        <p className="mt-3 text-muted-foreground">{t("book.closedDay")}</p>
       ) : (
         <ul className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-4">
           {slots.map(({ time, free }) => (
@@ -70,7 +75,7 @@ export async function SlotPicker({
               <Link
                 href={`${linkBase}&date=${date}&time=${time}#your-details`}
                 aria-current={time === selectedTime ? "true" : undefined}
-                title={free ? undefined : "Already taken"}
+                title={free ? undefined : t("book.taken")}
                 className={
                   !free
                     ? "block rounded-full bg-muted px-3 py-2 text-center text-sm text-muted-foreground line-through"
@@ -92,7 +97,11 @@ export async function SlotPicker({
           available={slots.some(
             (slot) => slot.time === selectedTime && slot.free,
           )}
-          summary={`${service.name} · ${formatDayShort(date)} · ${minutesToTime(selectedTime)}`}
+          summary={t("book.summary", {
+            service: service.name,
+            day: formatDayShort(date, locale),
+            time: minutesToTime(selectedTime),
+          })}
           slug={business.slug}
           serviceId={service.id}
           date={date}

@@ -3,7 +3,8 @@
 import { CalendarPlus, Loader2 } from "lucide-react";
 import { useState, useTransition } from "react";
 
-import { addTimeOff } from "@/app/(dashboard)/dashboard/schedule/actions";
+import { addTimeOff } from "@/app/[locale]/(dashboard)/dashboard/schedule/actions";
+import { useLocale, useT } from "@/components/i18n/i18n-provider";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -11,6 +12,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { calendarLocales } from "@/lib/i18n/calendar-locales";
 import { toDateString } from "@/lib/time";
 
 type AddTimeOffProps = {
@@ -19,6 +21,8 @@ type AddTimeOffProps = {
 };
 
 export function AddTimeOff({ today }: AddTimeOffProps) {
+  const t = useT();
+  const locale = useLocale();
   const [open, setOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -34,7 +38,7 @@ export function AddTimeOff({ today }: AddTimeOffProps) {
     startTransition(async () => {
       const result = await addTimeOff({ date: toDateString(date) });
       if (result?.error) {
-        setError(result.error);
+        setError(t(result.error));
       }
     });
   }
@@ -49,7 +53,7 @@ export function AddTimeOff({ today }: AddTimeOffProps) {
             ) : (
               <CalendarPlus aria-hidden="true" />
             )}
-            Add day off
+            {t("schedule.addDayOff")}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
@@ -59,6 +63,7 @@ export function AddTimeOff({ today }: AddTimeOffProps) {
             disabled={{ before: firstAllowedDay }}
             startMonth={firstAllowedDay}
             weekStartsOn={1}
+            locale={calendarLocales[locale]}
           />
         </PopoverContent>
       </Popover>

@@ -50,12 +50,12 @@ Better Auth with email and password. The server config is in `lib/auth.ts` (Pris
 
 Protected pages are checked twice:
 
-- `proxy.ts` (the Next.js 16 name for middleware) redirects `/dashboard/*` to `/sign-in` when there is no session cookie. It only looks at the cookie, never the database.
+- `proxy.ts` (the Next.js 16 name for middleware) redirects `/dashboard/*` and `/onboarding` to `/sign-in` when there is no session cookie. It only looks at the cookie, never the database. It also rewrites every page request to its language (see Languages).
 - `lib/dal.ts` `getCurrentUser()` does the real check against the database and redirects when the session is invalid. Every server page, action or handler that needs the user must call it. With `cacheComponents`, a component that calls it must render inside `<Suspense>`. Keep it out of a layout's top level, so the shell stays prerendered (the dashboard routes build as Partial Prerender).
 
 ## Onboarding
 
-Each owner has at most one `Business`. `/onboarding` is a three-step client wizard (business, first service, working hours) that submits once to the `completeOnboarding` Server Action in `app/onboarding/actions.ts`. The action re-checks the user and re-validates with `onboardingSchema`, then saves everything in one nested `prisma.business.create`. A `P2002` error there means the slug is taken. `getCurrentBusiness()` in `lib/dal.ts` drives the redirects both ways: `RequireBusiness`, rendered in the dashboard layout, sends owners without a business to `/onboarding`, and `/onboarding` sends owners who already have one to `/dashboard`.
+Each owner has at most one `Business`. `/onboarding` is a three-step client wizard (business, first service, working hours) that submits once to the `completeOnboarding` Server Action in `app/[locale]/onboarding/actions.ts`. The action re-checks the user and re-validates with `onboardingSchema`, then saves everything in one nested `prisma.business.create`. A `P2002` error there means the slug is taken. `getCurrentBusiness()` in `lib/dal.ts` drives the redirects both ways: `RequireBusiness`, rendered in the dashboard layout, sends owners without a business to `/onboarding`, and `/onboarding` sends owners who already have one to `/dashboard`.
 
 Server Actions are public endpoints, so every action must call the DAL and validate its input on the server, even when the form already validated it.
 
@@ -67,11 +67,17 @@ Days off (`TimeOff.date`, `@db.Date`) travel as `"YYYY-MM-DD"` strings (`timeOff
 
 ## Services
 
-`/dashboard/services` lists the business's services, with create and edit dialogs in `components/services/` and actions in `app/(dashboard)/dashboard/services/actions.ts`. Each action follows the same order: get the business from the DAL, `safeParse` the input, write, then `revalidatePath`. Updates use `updateMany` with `where: { id, businessId }` and treat `count === 0` as not found, so an owner cannot change another business's rows by sending its id. Services are hidden with `isActive`, never deleted, because bookings reference them. The active switch uses `useOptimistic` inside `startTransition`.
+`/dashboard/services` lists the business's services, with create and edit dialogs in `components/services/` and actions in `app/[locale]/(dashboard)/dashboard/services/actions.ts`. Each action follows the same order: get the business from the DAL, `safeParse` the input, write, then `revalidatePath`. Updates use `updateMany` with `where: { id, businessId }` and treat `count === 0` as not found, so an owner cannot change another business's rows by sending its id. Services are hidden with `isActive`, never deleted, because bookings reference them. The active switch uses `useOptimistic` inside `startTransition`.
+
+## Languages
+
+The interface is in English and Ukrainian. Every page lives under `app/[locale]/`, but the address never shows the language: `proxy.ts` reads the `locale` cookie (or the browser's Accept-Language) and rewrites `/dashboard` to `/uk/dashboard` behind the scenes. So each page is still prerendered once per language, and the dashboard stays Partial Prerender. A visitor who types `/uk/...` is redirected to the plain address and the cookie is set. `LocaleSwitcher` sets the cookie and reloads the page.
+
+All text is in `lib/i18n/messages/en.ts` (the source of truth) and `uk.ts` (typed to have the same keys). `lib/i18n/messages.test.ts` checks the keys, the `{placeholders}`, and that every key used in the code exists. Server Components get the language from `params` (`getI18n(params)` in `lib/i18n/server.ts`), and Client Components use `useT()` from the provider that the layout adds. `t()` returns a text that is not a key as it is, so it is safe to call on anything. The Zod messages and the `error` strings that Server Actions return are keys of the messages; `FieldError` and the forms translate them. Pass the page language to the `formatDay*` helpers in `lib/time.ts` and use `calendarLocales` for calendars, so dates are written the same on the server and in the browser. Revalidate with the route pattern, for example `revalidatePath("/[locale]/dashboard/services", "page")`, so every language is refreshed. The fonts include the Cyrillic subset.
 
 ## Bookings, dashboard and demo
 
-A client books on `/book/[slug]` (`createBooking` in `app/book/[slug]/actions.ts`), then lands on `/booking/[token]`, a private page found by the booking's `cancelToken`, where they can cancel (`cancelBookingByToken`). Double booking is blocked twice: `getSlotsForDay` hides taken times, and the `Booking_no_overlap` exclusion constraint (a hand-written migration) makes the database refuse an overlap. `isOverlapError` in `lib/booking-errors.ts` recognises that error, and `createBooking` answers "This time was just taken". The owner sees bookings in `/dashboard/bookings` and cancels them with `cancelBooking`. Slot start times follow the length of the service: a 65-minute service starts every 65 minutes.
+A client books on `/book/[slug]` (`createBooking` in `app/[locale]/book/[slug]/actions.ts`), then lands on `/booking/[token]`, a private page found by the booking's `cancelToken`, where they can cancel (`cancelBookingByToken`). Double booking is blocked twice: `getSlotsForDay` hides taken times, and the `Booking_no_overlap` exclusion constraint (a hand-written migration) makes the database refuse an overlap. `isOverlapError` in `lib/booking-errors.ts` recognises that error, and `createBooking` answers "This time was just taken". The owner sees bookings in `/dashboard/bookings` and cancels them with `cancelBooking`. Slot start times follow the length of the service: a 65-minute service starts every 65 minutes.
 
 The whole app uses one rose palette and the serif `font-display` for headings. The tokens are in `app/globals.css`.
 
