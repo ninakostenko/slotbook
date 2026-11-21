@@ -3,11 +3,13 @@
 import { LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 
+import { useT } from "@/components/i18n/i18n-provider";
 import { Button } from "@/components/ui/button";
 import { authClient } from "@/lib/auth-client";
 
 export function SignOutButton() {
   const router = useRouter();
+  const t = useT();
 
   async function handleSignOut() {
     await authClient.signOut();
@@ -21,7 +23,7 @@ export function SignOutButton() {
       variant="ghost"
       size="icon-sm"
       onClick={handleSignOut}
-      aria-label="Sign out"
+      aria-label={t("dashboard.signOut")}
     >
       <LogOut />
     </Button>

@@ -4,6 +4,7 @@ import { Loader2 } from "lucide-react";
 import { useState, useTransition } from "react";
 
 import { cancelBookingByToken } from "@/app/[locale]/booking/[token]/actions";
+import { useT } from "@/components/i18n/i18n-provider";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -18,6 +19,7 @@ import {
 
 // The client's "Cancel booking" button, with a question first.
 export function CancelMyBookingButton({ token }: { token: string }) {
+  const t = useT();
   const [open, setOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -27,7 +29,7 @@ export function CancelMyBookingButton({ token }: { token: string }) {
     startTransition(async () => {
       const result = await cancelBookingByToken(token);
       if (result?.error) {
-        setError(result.error);
+        setError(t(result.error));
         return;
       }
       // The page refreshes by itself and shows that the booking is cancelled.
@@ -38,14 +40,14 @@ export function CancelMyBookingButton({ token }: { token: string }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">Cancel booking</Button>
+        <Button variant="outline">{t("confirmation.cancel")}</Button>
       </DialogTrigger>
 
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Cancel your booking?</DialogTitle>
+          <DialogTitle>{t("confirmation.cancelTitle")}</DialogTitle>
           <DialogDescription>
-            The time becomes free again for other clients.
+            {t("confirmation.cancelDescription")}
           </DialogDescription>
         </DialogHeader>
 
@@ -57,7 +59,7 @@ export function CancelMyBookingButton({ token }: { token: string }) {
 
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="outline">Keep booking</Button>
+            <Button variant="outline">{t("confirmation.keep")}</Button>
           </DialogClose>
           <Button
             variant="destructive"
@@ -67,7 +69,7 @@ export function CancelMyBookingButton({ token }: { token: string }) {
             {isPending && (
               <Loader2 className="animate-spin" aria-hidden="true" />
             )}
-            Yes, cancel
+            {t("confirmation.yesCancel")}
           </Button>
         </DialogFooter>
       </DialogContent>

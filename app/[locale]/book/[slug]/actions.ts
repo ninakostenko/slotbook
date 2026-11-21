@@ -19,22 +19,21 @@ export async function createBooking(
   input: BookingInput,
 ): Promise<CreateBookingResult> {
   const parsed = bookingSchema.safeParse(input);
-  if (!parsed.success) return { ok: false, error: "Invalid booking data" };
+  if (!parsed.success) return { ok: false, error: "errors.invalidBooking" };
 
   const business = await prisma.business.findUnique({
     where: { slug },
   });
-  if (!business) return { ok: false, error: "Business not found" };
+  if (!business) return { ok: false, error: "errors.businessNotFound" };
   const { serviceId, date, time, clientName, clientEmail } = parsed.data;
 
   const service = await prisma.service.findFirst({
     where: { id: serviceId, businessId: business.id, isActive: true },
   });
-  if (!service) return { ok: false, error: "not found service" };
+  if (!service) return { ok: false, error: "errors.serviceNotFound" };
 
   const slots = await getSlotsForDay(business.id, service.id, date);
-  if (!slots.includes(time))
-    return { ok: false, error: "This time was just taken" };
+  if (!slots.includes(time)) return { ok: false, error: "errors.timeTaken" };
 
   const startsAt = zonedTimeToDate(date, time, business.timezone);
   const endsAt = new Date(
@@ -58,7 +57,7 @@ export async function createBooking(
   } catch (error) {
     if (isOverlapError(error)) {
       revalidatePath("/[locale]/book/[slug]", "page");
-      return { ok: false, error: "This time was just taken" };
+      return { ok: false, error: "errors.timeTaken" };
     }
     throw error;
   }

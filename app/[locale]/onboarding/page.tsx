@@ -1,17 +1,17 @@
-import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
 import { OnboardingWizard } from "@/components/onboarding/onboarding-wizard";
 import { getCurrentBusiness } from "@/lib/dal";
+import { LocaleSwitcher } from "@/components/i18n/locale-switcher";
+import { pageTitle } from "@/lib/i18n/metadata";
 
-export const metadata: Metadata = {
-  title: "Set up your booking page · SlotBook",
-};
+export const generateMetadata = pageTitle("meta.onboarding");
 
 export default function OnboardingPage() {
   return (
-    <main className="flex flex-1 items-center justify-center px-4 py-12">
+    <main className="relative flex flex-1 items-center justify-center px-4 py-12">
+      <LocaleSwitcher className="absolute top-4 right-4" />
       <Suspense
         fallback={
           <div className="h-96 w-full max-w-lg animate-pulse rounded-xl bg-muted" />

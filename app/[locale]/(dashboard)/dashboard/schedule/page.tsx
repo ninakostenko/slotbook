@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { Suspense } from "react";
 
 import { AddTimeOff } from "@/components/schedule/add-time-off";
@@ -12,22 +11,26 @@ import {
   todayInTimeZone,
   weekDays,
 } from "@/lib/time";
+import type { Locale } from "@/lib/i18n/config";
+import { pageTitle } from "@/lib/i18n/metadata";
+import { getI18n } from "@/lib/i18n/server";
+import { getT } from "@/lib/i18n/translate";
 
-export const metadata: Metadata = {
-  title: "Schedule · SlotBook",
-};
+export const generateMetadata = pageTitle("meta.schedule");
 
-export default function SchedulePage() {
+export default async function SchedulePage({
+  params,
+}: PageProps<"/[locale]/dashboard/schedule">) {
+  const { locale, t } = await getI18n(params);
+
   return (
     <div className="mx-auto max-w-5xl">
       <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-        Schedule
+        {t("dashboard.nav.schedule")}
       </h1>
-      <p className="mt-2 text-muted-foreground">
-        Set the days and hours clients can book.
-      </p>
+      <p className="mt-2 text-muted-foreground">{t("schedule.subtitle")}</p>
 
-      <Suspense fallback={<p className="mt-8">Loading…</p>}>
+      <Suspense fallback={<p className="mt-8">{t("common.loading")}</p>}>
         <ScheduleEditor />
       </Suspense>
 
@@ -36,20 +39,21 @@ export default function SchedulePage() {
           id="days-off-heading"
           className="text-lg font-semibold tracking-tight"
         >
-          Days off
+          {t("schedule.daysOff")}
         </h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Holidays or vacation: clients cannot book on these dates.
+          {t("schedule.daysOffText")}
         </p>
-        <Suspense fallback={<p className="mt-4">Loading…</p>}>
-          <DaysOff />
+        <Suspense fallback={<p className="mt-4">{t("common.loading")}</p>}>
+          <DaysOff locale={locale} />
         </Suspense>
       </section>
     </div>
   );
 }
 
-async function DaysOff() {
+async function DaysOff({ locale }: { locale: Locale }) {
+  const t = getT(locale);
   const business = await getCurrentBusiness();
   if (!business) return null;
 
@@ -69,12 +73,12 @@ async function DaysOff() {
 
       {daysOff.length === 0 ? (
         <p className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
-          No days off planned
+          {t("schedule.noDaysOff")}
         </p>
       ) : (
         <ul className="divide-y rounded-lg border">
           {daysOff.map((dayOff) => {
-            const label = formatDay(dayOff.date);
+            const label = formatDay(dayOff.date, locale);
             return (
               <li
                 key={dayOff.id}

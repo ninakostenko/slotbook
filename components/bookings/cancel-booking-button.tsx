@@ -4,6 +4,7 @@ import { Loader2 } from "lucide-react";
 import { useState, useTransition } from "react";
 
 import { cancelBooking } from "@/app/[locale]/(dashboard)/dashboard/bookings/actions";
+import { useT } from "@/components/i18n/i18n-provider";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -26,6 +27,7 @@ export function CancelBookingButton({
   bookingId,
   summary,
 }: CancelBookingButtonProps) {
+  const t = useT();
   const [open, setOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -35,7 +37,7 @@ export function CancelBookingButton({
     startTransition(async () => {
       const result = await cancelBooking(bookingId);
       if (result?.error) {
-        setError(result.error);
+        setError(t(result.error));
         return;
       }
       setOpen(false);
@@ -46,15 +48,15 @@ export function CancelBookingButton({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="ghost" size="sm">
-          Cancel
+          {t("bookings.cancel")}
         </Button>
       </DialogTrigger>
 
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Cancel this booking?</DialogTitle>
+          <DialogTitle>{t("bookings.cancelTitle")}</DialogTitle>
           <DialogDescription>
-            {summary}. The time becomes free again.
+            {t("bookings.cancelDescription", { summary })}
           </DialogDescription>
         </DialogHeader>
 
@@ -66,7 +68,7 @@ export function CancelBookingButton({
 
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="outline">Keep booking</Button>
+            <Button variant="outline">{t("bookings.keep")}</Button>
           </DialogClose>
           <Button
             variant="destructive"
@@ -76,7 +78,7 @@ export function CancelBookingButton({
             {isPending && (
               <Loader2 className="animate-spin" aria-hidden="true" />
             )}
-            Cancel booking
+            {t("bookings.cancelConfirm")}
           </Button>
         </DialogFooter>
       </DialogContent>

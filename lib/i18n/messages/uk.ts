@@ -25,6 +25,7 @@ export const uk: Messages = {
     continue: "Далі",
     closed: "Вихідний",
     change: "Змінити",
+    close: "Закрити",
     language: "Мова",
     uah: "{amount} грн",
     minutes: "{count} хв",

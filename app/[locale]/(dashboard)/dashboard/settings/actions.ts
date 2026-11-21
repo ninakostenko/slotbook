@@ -11,12 +11,12 @@ import { businessDetailsSchema } from "@/lib/validations/business";
 export async function updateBusiness(input: unknown) {
   const business = await getCurrentBusiness();
   if (!business) {
-    return { error: "Business not found" };
+    return { error: "errors.businessNotFound" };
   }
 
   const parsed = businessDetailsSchema.safeParse(input);
   if (!parsed.success) {
-    return { error: "Some fields are not valid." };
+    return { error: "errors.invalidForm" };
   }
 
   await prisma.business.update({

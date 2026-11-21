@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { Suspense } from "react";
 
 import { CancelBookingButton } from "@/components/bookings/cancel-booking-button";
@@ -6,29 +5,34 @@ import { Badge } from "@/components/ui/badge";
 import { getCurrentBusiness } from "@/lib/dal";
 import { prisma } from "@/lib/db";
 import { dateInTimeZone, formatDayInZone, formatTimeInZone } from "@/lib/time";
+import type { Locale } from "@/lib/i18n/config";
+import { pageTitle } from "@/lib/i18n/metadata";
+import { getI18n } from "@/lib/i18n/server";
+import { getT } from "@/lib/i18n/translate";
 
-export const metadata: Metadata = {
-  title: "Bookings · SlotBook",
-};
+export const generateMetadata = pageTitle("meta.bookings");
 
-export default function BookingsPage() {
+export default async function BookingsPage({
+  params,
+}: PageProps<"/[locale]/dashboard/bookings">) {
+  const { locale, t } = await getI18n(params);
+
   return (
     <div className="mx-auto max-w-5xl">
       <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-        Bookings
+        {t("dashboard.nav.bookings")}
       </h1>
-      <p className="mt-2 text-muted-foreground">
-        See and manage your upcoming appointments.
-      </p>
+      <p className="mt-2 text-muted-foreground">{t("bookings.subtitle")}</p>
 
-      <Suspense fallback={<p className="mt-8">Loading…</p>}>
-        <BookingsLists />
+      <Suspense fallback={<p className="mt-8">{t("common.loading")}</p>}>
+        <BookingsLists locale={locale} />
       </Suspense>
     </div>
   );
 }
 
-async function BookingsLists() {
+async function BookingsLists({ locale }: { locale: Locale }) {
+  const t = getT(locale);
   const business = await getCurrentBusiness();
   if (!business) return null;
 
@@ -69,12 +73,12 @@ async function BookingsLists() {
   return (
     <>
       <section className="mt-8">
-        <h2 className="text-lg font-semibold">Upcoming</h2>
+        <h2 className="text-lg font-semibold">{t("bookings.upcoming")}</h2>
         {upcoming.length === 0 ? (
           <div className="mt-3 rounded-lg border border-dashed p-10 text-center">
-            <p className="font-medium">No upcoming bookings</p>
+            <p className="font-medium">{t("bookings.none")}</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              Share your booking page link, and new bookings will appear here.
+              {t("bookings.noneHint")}
             </p>
           </div>
         ) : (
@@ -85,7 +89,7 @@ async function BookingsLists() {
               return (
                 <div key={day}>
                   <h3 className="text-sm font-medium text-muted-foreground">
-                    {formatDayInZone(first.startsAt, timeZone)}
+                    {formatDayInZone(first.startsAt, timeZone, locale)}
                   </h3>
                   <ul className="mt-2 divide-y rounded-lg border">
                     {dayBookings.map((booking) => (
@@ -93,6 +97,7 @@ async function BookingsLists() {
                         key={booking.id}
                         booking={booking}
                         timeZone={timeZone}
+                        locale={locale}
                         canCancel
                       />
                     ))}
@@ -106,13 +111,14 @@ async function BookingsLists() {
 
       {earlier.length > 0 && (
         <section className="mt-10">
-          <h2 className="text-lg font-semibold">Earlier and cancelled</h2>
+          <h2 className="text-lg font-semibold">{t("bookings.earlier")}</h2>
           <ul className="mt-3 divide-y rounded-lg border">
             {earlier.map((booking) => (
               <BookingRow
                 key={booking.id}
                 booking={booking}
                 timeZone={timeZone}
+                locale={locale}
                 showDay
               />
             ))}
@@ -134,6 +140,7 @@ type BookingRowProps = {
     service: { name: string };
   };
   timeZone: string;
+  locale: Locale;
   canCancel?: boolean;
   showDay?: boolean;
 };
@@ -141,11 +148,13 @@ type BookingRowProps = {
 function BookingRow({
   booking,
   timeZone,
+  locale,
   canCancel,
   showDay,
 }: BookingRowProps) {
+  const t = getT(locale);
   const time = `${formatTimeInZone(booking.startsAt, timeZone)}–${formatTimeInZone(booking.endsAt, timeZone)}`;
-  const day = formatDayInZone(booking.startsAt, timeZone);
+  const day = formatDayInZone(booking.startsAt, timeZone, locale);
   const cancelled = booking.status === "CANCELLED";
 
   return (
@@ -161,12 +170,14 @@ function BookingRow({
           >
             {showDay ? `${day}, ${time}` : time}
           </span>
-          {cancelled && <Badge variant="destructive">Cancelled</Badge>}
+          {cancelled && (
+            <Badge variant="destructive">{t("bookings.cancelled")}</Badge>
+          )}
           {booking.status === "NO_SHOW" && (
-            <Badge variant="secondary">No show</Badge>
+            <Badge variant="secondary">{t("bookings.noShow")}</Badge>
           )}
           {booking.status === "COMPLETED" && (
-            <Badge variant="secondary">Done</Badge>
+            <Badge variant="secondary">{t("bookings.done")}</Badge>
           )}
         </div>
         <p className="mt-0.5 truncate text-sm text-muted-foreground">

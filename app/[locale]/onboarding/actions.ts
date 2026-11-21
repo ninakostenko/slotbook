@@ -27,7 +27,7 @@ export async function completeOnboarding(
 
   const parsed = onboardingSchema.safeParse(input);
   if (!parsed.success) {
-    return { error: "Some fields are not valid. Please check the form." };
+    return { error: "errors.invalidForm" };
   }
 
   const { business, service, schedule } = parsed.data;
@@ -66,7 +66,7 @@ export async function completeOnboarding(
       error.code === "P2002"
     ) {
       return {
-        error: "This link is already taken. Try another one.",
+        error: "errors.slugTaken",
         field: "business.slug",
       };
     }

@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { createService } from "@/app/[locale]/(dashboard)/dashboard/services/actions";
+import { useT } from "@/components/i18n/i18n-provider";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -27,6 +28,7 @@ import { serviceSchema, type ServiceInput } from "@/lib/validations/onboarding";
 
 export function AddServiceDialog() {
   const [open, setOpen] = useState(false); // чи відкрите вікно
+  const t = useT();
   const [serverError, setServerError] = useState<string | null>(null);
 
   const {
@@ -45,7 +47,7 @@ export function AddServiceDialog() {
     const result = await createService(values);
 
     if (result?.error) {
-      setServerError(result.error);
+      setServerError(t(result.error));
       return;
     }
 
@@ -58,22 +60,22 @@ export function AddServiceDialog() {
       <DialogTrigger asChild>
         <Button>
           <Plus aria-hidden="true" />
-          Add service
+          {t("services.add")}
         </Button>
       </DialogTrigger>
 
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>New service</DialogTitle>
-          <DialogDescription>
-            Clients will see it on your booking page.
-          </DialogDescription>
+          <DialogTitle>{t("services.newTitle")}</DialogTitle>
+          <DialogDescription>{t("services.newDescription")}</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
           <FieldGroup>
             <Field data-invalid={!!errors.name}>
-              <FieldLabel htmlFor="service-name">Service name</FieldLabel>
+              <FieldLabel htmlFor="service-name">
+                {t("services.name")}
+              </FieldLabel>
               <Input
                 id="service-name"
                 aria-invalid={!!errors.name}
@@ -83,7 +85,7 @@ export function AddServiceDialog() {
             </Field>
             <Field data-invalid={!!errors.durationMinutes}>
               <FieldLabel htmlFor="service-duration">
-                Duration (minutes)
+                {t("services.duration")}
               </FieldLabel>
               <Input
                 id="service-duration"
@@ -100,7 +102,9 @@ export function AddServiceDialog() {
             </Field>
 
             <Field data-invalid={!!errors.price}>
-              <FieldLabel htmlFor="service-price">Price (UAH)</FieldLabel>
+              <FieldLabel htmlFor="service-price">
+                {t("services.price")}
+              </FieldLabel>
               <Input
                 id="service-price"
                 type="number"
@@ -126,7 +130,7 @@ export function AddServiceDialog() {
               {isSubmitting && (
                 <Loader2 className="animate-spin" aria-hidden="true" />
               )}
-              {isSubmitting ? "Saving…" : "Save service"}
+              {isSubmitting ? t("common.saving") : t("services.save")}
             </Button>
           </DialogFooter>
         </form>

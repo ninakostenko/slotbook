@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { updateService } from "@/app/[locale]/(dashboard)/dashboard/services/actions";
+import { useT } from "@/components/i18n/i18n-provider";
 import { Button } from "@/components/ui/button";
 
 import {
@@ -37,6 +38,7 @@ type EditServiceDialogProps = {
 
 export function EditServiceDialog({ service }: EditServiceDialogProps) {
   const [open, setOpen] = useState(false); // чи відкрите вікно
+  const t = useT();
   const [serverError, setServerError] = useState<string | null>(null);
 
   const {
@@ -58,7 +60,7 @@ export function EditServiceDialog({ service }: EditServiceDialogProps) {
     const result = await updateService(service.id, values);
 
     if (result?.error) {
-      setServerError(result.error);
+      setServerError(t(result.error));
       return;
     }
 
@@ -71,7 +73,7 @@ export function EditServiceDialog({ service }: EditServiceDialogProps) {
         <Button
           variant="ghost"
           size="icon-sm"
-          aria-label={`Edit ${service.name}`}
+          aria-label={t("services.edit", { name: service.name })}
         >
           <Pencil aria-hidden="true" />
         </Button>
@@ -79,15 +81,15 @@ export function EditServiceDialog({ service }: EditServiceDialogProps) {
 
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Edit service</DialogTitle>
-          <DialogDescription>Changes apply to new bookings.</DialogDescription>
+          <DialogTitle>{t("services.editTitle")}</DialogTitle>
+          <DialogDescription>{t("services.editDescription")}</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
           <FieldGroup>
             <Field data-invalid={!!errors.name}>
               <FieldLabel htmlFor={`edit-name-${service.id}`}>
-                Service name
+                {t("services.name")}
               </FieldLabel>
               <Input
                 id={`edit-name-${service.id}`}
@@ -98,7 +100,7 @@ export function EditServiceDialog({ service }: EditServiceDialogProps) {
             </Field>
             <Field data-invalid={!!errors.durationMinutes}>
               <FieldLabel htmlFor={`edit-duration-${service.id}`}>
-                Duration (minutes)
+                {t("services.duration")}
               </FieldLabel>
               <Input
                 id={`edit-duration-${service.id}`}
@@ -116,7 +118,7 @@ export function EditServiceDialog({ service }: EditServiceDialogProps) {
 
             <Field data-invalid={!!errors.price}>
               <FieldLabel htmlFor={`edit-price-${service.id}`}>
-                Price (UAH)
+                {t("services.price")}
               </FieldLabel>
               <Input
                 id={`edit-price-${service.id}`}
@@ -143,7 +145,7 @@ export function EditServiceDialog({ service }: EditServiceDialogProps) {
               {isSubmitting && (
                 <Loader2 className="animate-spin" aria-hidden="true" />
               )}
-              {isSubmitting ? "Saving…" : "Save service"}
+              {isSubmitting ? t("common.saving") : t("services.save")}
             </Button>
           </DialogFooter>
         </form>

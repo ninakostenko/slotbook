@@ -9,7 +9,7 @@ import { prisma } from "@/lib/db";
 export async function cancelBooking(bookingId: string) {
   const business = await getCurrentBusiness();
   if (!business) {
-    return { error: "Business not found" };
+    return { error: "errors.businessNotFound" };
   }
 
   // `businessId` in the where keeps an owner from cancelling another business's booking
@@ -19,7 +19,7 @@ export async function cancelBooking(bookingId: string) {
     data: { status: "CANCELLED" },
   });
   if (result.count === 0) {
-    return { error: "Booking not found" };
+    return { error: "errors.bookingNotFound" };
   }
 
   revalidatePath("/[locale]/dashboard", "layout");

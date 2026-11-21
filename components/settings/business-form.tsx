@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { updateBusiness } from "@/app/[locale]/(dashboard)/dashboard/settings/actions";
+import { useT } from "@/components/i18n/i18n-provider";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -27,6 +28,7 @@ type BusinessFormProps = {
 };
 
 export function BusinessForm({ name, description }: BusinessFormProps) {
+  const t = useT();
   const [serverError, setServerError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
 
@@ -45,7 +47,7 @@ export function BusinessForm({ name, description }: BusinessFormProps) {
 
     const result = await updateBusiness(values);
     if (result?.error) {
-      setServerError(result.error);
+      setServerError(t(result.error));
       return;
     }
     setSaved(true);
@@ -55,7 +57,7 @@ export function BusinessForm({ name, description }: BusinessFormProps) {
     <form onSubmit={handleSubmit(onSubmit)} className="mt-6" noValidate>
       <FieldGroup>
         <Field data-invalid={!!errors.name}>
-          <FieldLabel htmlFor="business-name">Name</FieldLabel>
+          <FieldLabel htmlFor="business-name">{t("settings.name")}</FieldLabel>
           <Input
             id="business-name"
             autoComplete="organization"
@@ -66,7 +68,9 @@ export function BusinessForm({ name, description }: BusinessFormProps) {
         </Field>
 
         <Field data-invalid={!!errors.description}>
-          <FieldLabel htmlFor="business-description">Description</FieldLabel>
+          <FieldLabel htmlFor="business-description">
+            {t("settings.description")}
+          </FieldLabel>
           <Textarea
             id="business-description"
             rows={4}
@@ -83,7 +87,7 @@ export function BusinessForm({ name, description }: BusinessFormProps) {
         )}
         {saved && (
           <p role="status" className="text-sm text-primary">
-            Saved.
+            {t("settings.saved")}
           </p>
         )}
 
@@ -91,7 +95,7 @@ export function BusinessForm({ name, description }: BusinessFormProps) {
           {isSubmitting && (
             <Loader2 className="animate-spin" aria-hidden="true" />
           )}
-          {isSubmitting ? "Saving…" : "Save"}
+          {isSubmitting ? t("common.saving") : t("common.save")}
         </Button>
       </FieldGroup>
     </form>

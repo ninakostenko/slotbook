@@ -4,6 +4,7 @@ import { Loader2, X } from "lucide-react";
 import { useTransition } from "react";
 
 import { removeTimeOff } from "@/app/[locale]/(dashboard)/dashboard/schedule/actions";
+import { useT } from "@/components/i18n/i18n-provider";
 import { Button } from "@/components/ui/button";
 
 type RemoveTimeOffButtonProps = {
@@ -15,13 +16,14 @@ export function RemoveTimeOffButton({
   timeOffId,
   label,
 }: RemoveTimeOffButtonProps) {
+  const t = useT();
   const [isPending, startTransition] = useTransition();
 
   return (
     <Button
       variant="ghost"
       size="icon-sm"
-      aria-label={`Remove day off ${label}`}
+      aria-label={t("schedule.removeDayOff", { label })}
       disabled={isPending}
       onClick={() =>
         startTransition(async () => {

@@ -6,6 +6,7 @@ import { useState, type FormEvent } from "react";
 import { Controller, useForm, useWatch, type FieldPath } from "react-hook-form";
 
 import { completeOnboarding } from "@/app/[locale]/onboarding/actions";
+import { useT } from "@/components/i18n/i18n-provider";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -25,6 +26,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { TimeSelect } from "@/components/schedule/time-select";
+import { slugify } from "@/lib/slug";
 import { weekDays } from "@/lib/time";
 import {
   onboardingSchema,
@@ -37,34 +39,24 @@ const steps: {
   fields: FieldPath<OnboardingInput>[];
 }[] = [
   {
-    title: "Your business",
-    description: "This is what clients see on your booking page.",
+    title: "onboarding.business.title",
+    description: "onboarding.business.description",
     fields: ["business.name", "business.slug"],
   },
   {
-    title: "Your first service",
-    description: "You can add more services later.",
+    title: "onboarding.service.title",
+    description: "onboarding.service.description",
     fields: ["service.name", "service.durationMinutes", "service.price"],
   },
   {
-    title: "Working hours",
-    description: "Clients can only book inside these hours.",
+    title: "onboarding.hours.title",
+    description: "onboarding.hours.description",
     fields: ["schedule.days"],
   },
 ];
 
-// "Anna's Studio" -> "annas-studio". Non-Latin letters are dropped,
-// so the owner can still type the link by hand.
-function slugify(text: string) {
-  return text
-    .toLowerCase()
-    .replace(/['’]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 40);
-}
-
 export function OnboardingWizard() {
+  const t = useT();
   const [step, setStep] = useState(0);
   const [slugEdited, setSlugEdited] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
@@ -113,7 +105,7 @@ export function OnboardingWizard() {
       setError(result.field, { message: result.error });
       setStep(0);
     } else if (result) {
-      setServerError(result.error);
+      setServerError(t(result.error));
     }
   }
 
@@ -131,10 +123,10 @@ export function OnboardingWizard() {
     <Card className="w-full max-w-lg">
       <CardHeader>
         <p className="text-sm font-medium text-primary">
-          Step {step + 1} of {steps.length}
+          {t("onboarding.stepOf", { step: step + 1, total: steps.length })}
         </p>
-        <CardTitle className="text-xl">{current.title}</CardTitle>
-        <CardDescription>{current.description}</CardDescription>
+        <CardTitle className="text-xl">{t(current.title)}</CardTitle>
+        <CardDescription>{t(current.description)}</CardDescription>
         <div className="mt-2 flex gap-1.5" aria-hidden="true">
           {steps.map((s, index) => (
             <span
@@ -154,10 +146,12 @@ export function OnboardingWizard() {
           {step === 0 && (
             <FieldGroup>
               <Field data-invalid={!!errors.business?.name}>
-                <FieldLabel htmlFor="business-name">Business name</FieldLabel>
+                <FieldLabel htmlFor="business-name">
+                  {t("onboarding.business.name")}
+                </FieldLabel>
                 <Input
                   id="business-name"
-                  placeholder="Anna's Studio"
+                  placeholder={t("onboarding.business.namePlaceholder")}
                   aria-invalid={!!errors.business?.name}
                   {...register("business.name", {
                     onChange: (event) => {
@@ -172,18 +166,20 @@ export function OnboardingWizard() {
 
               <Field data-invalid={!!errors.business?.slug}>
                 <FieldLabel htmlFor="business-slug">
-                  Booking page link
+                  {t("onboarding.business.link")}
                 </FieldLabel>
                 <Input
                   id="business-slug"
-                  placeholder="anna-studio"
+                  placeholder={t("onboarding.business.linkPlaceholder")}
                   aria-invalid={!!errors.business?.slug}
                   {...register("business.slug", {
                     onChange: () => setSlugEdited(true),
                   })}
                 />
                 <FieldDescription>
-                  Your page: slotbook.app/book/{slug || "your-link"}
+                  {t("onboarding.business.linkHint", {
+                    slug: slug || t("onboarding.business.linkFallback"),
+                  })}
                 </FieldDescription>
                 <FieldError errors={[errors.business?.slug]} />
               </Field>
@@ -193,10 +189,12 @@ export function OnboardingWizard() {
           {step === 1 && (
             <FieldGroup>
               <Field data-invalid={!!errors.service?.name}>
-                <FieldLabel htmlFor="service-name">Service name</FieldLabel>
+                <FieldLabel htmlFor="service-name">
+                  {t("onboarding.service.name")}
+                </FieldLabel>
                 <Input
                   id="service-name"
-                  placeholder="Haircut"
+                  placeholder={t("onboarding.service.namePlaceholder")}
                   aria-invalid={!!errors.service?.name}
                   {...register("service.name")}
                 />
@@ -206,7 +204,7 @@ export function OnboardingWizard() {
               <div className="grid gap-4 sm:grid-cols-2">
                 <Field data-invalid={!!errors.service?.durationMinutes}>
                   <FieldLabel htmlFor="service-duration">
-                    Duration (minutes)
+                    {t("onboarding.service.duration")}
                   </FieldLabel>
                   <Input
                     id="service-duration"
@@ -223,7 +221,9 @@ export function OnboardingWizard() {
                 </Field>
 
                 <Field data-invalid={!!errors.service?.price}>
-                  <FieldLabel htmlFor="service-price">Price (UAH)</FieldLabel>
+                  <FieldLabel htmlFor="service-price">
+                    {t("onboarding.service.price")}
+                  </FieldLabel>
                   <Input
                     id="service-price"
                     type="number"
@@ -242,7 +242,8 @@ export function OnboardingWizard() {
 
           {step === 2 && (
             <div className="flex flex-col gap-1">
-              {weekDays.map(({ label }, index) => {
+              {weekDays.map(({ dayOfWeek }, index) => {
+                const label = t(`weekdays.${dayOfWeek}`);
                 const enabled = days[index]?.enabled ?? false;
                 const endError = errors.schedule?.days?.[index]?.end;
                 return (
@@ -275,7 +276,9 @@ export function OnboardingWizard() {
                             <TimeSelect
                               value={field.value}
                               onChange={field.onChange}
-                              aria-label={`${label} start`}
+                              aria-label={t("onboarding.hours.start", {
+                                day: label,
+                              })}
                             />
                           )}
                         />
@@ -287,7 +290,9 @@ export function OnboardingWizard() {
                             <TimeSelect
                               value={field.value}
                               onChange={field.onChange}
-                              aria-label={`${label} end`}
+                              aria-label={t("onboarding.hours.end", {
+                                day: label,
+                              })}
                               invalid={!!endError}
                             />
                           )}
@@ -295,7 +300,7 @@ export function OnboardingWizard() {
                       </div>
                     ) : (
                       <span className="text-sm text-muted-foreground">
-                        Closed
+                        {t("common.closed")}
                       </span>
                     )}
 
@@ -304,7 +309,7 @@ export function OnboardingWizard() {
                         role="alert"
                         className="w-full text-sm text-destructive"
                       >
-                        {endError.message}
+                        {t(endError.message ?? "")}
                       </p>
                     )}
                   </div>
@@ -312,7 +317,7 @@ export function OnboardingWizard() {
               })}
               {daysError && (
                 <p role="alert" className="mt-2 text-sm text-destructive">
-                  {daysError}
+                  {t(daysError)}
                 </p>
               )}
             </div>
@@ -332,7 +337,7 @@ export function OnboardingWizard() {
             onClick={() => setStep((s) => s - 1)}
             disabled={step === 0 || isSubmitting}
           >
-            Back
+            {t("common.back")}
           </Button>
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting && (
@@ -340,9 +345,9 @@ export function OnboardingWizard() {
             )}
             {isLastStep
               ? isSubmitting
-                ? "Saving…"
-                : "Finish setup"
-              : "Continue"}
+                ? t("common.saving")
+                : t("onboarding.finish")
+              : t("common.continue")}
           </Button>
         </CardFooter>
       </form>

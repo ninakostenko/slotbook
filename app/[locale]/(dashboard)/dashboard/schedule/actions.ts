@@ -11,12 +11,12 @@ import { scheduleSchema, timeOffSchema } from "@/lib/validations/onboarding";
 export async function updateSchedule(input: unknown) {
   const business = await getCurrentBusiness();
   if (!business) {
-    return { error: "Business not found" };
+    return { error: "errors.businessNotFound" };
   }
 
   const parsed = scheduleSchema.safeParse(input);
   if (!parsed.success) {
-    return { error: "Some fields are not valid. Please check the form." };
+    return { error: "errors.invalidForm" };
   }
 
   const rows = parsed.data.days
@@ -39,12 +39,12 @@ export async function updateSchedule(input: unknown) {
 export async function addTimeOff(input: unknown) {
   const business = await getCurrentBusiness();
   if (!business) {
-    return { error: "Business not found" };
+    return { error: "errors.businessNotFound" };
   }
 
   const parsed = timeOffSchema.safeParse(input);
   if (!parsed.success) {
-    return { error: "Pick a valid date." };
+    return { error: "errors.invalidDate" };
   }
 
   try {
@@ -61,7 +61,7 @@ export async function addTimeOff(input: unknown) {
       error instanceof Prisma.PrismaClientKnownRequestError &&
       error.code === "P2002"
     ) {
-      return { error: "This day is already off" };
+      return { error: "errors.dayAlreadyOff" };
     }
     throw error;
   }
@@ -72,7 +72,7 @@ export async function addTimeOff(input: unknown) {
 export async function removeTimeOff(timeOffId: string) {
   const business = await getCurrentBusiness();
   if (!business) {
-    return { error: "Business not found" };
+    return { error: "errors.businessNotFound" };
   }
 
   // Both conditions: the day off must belong to this business (no IDOR).
@@ -81,7 +81,7 @@ export async function removeTimeOff(timeOffId: string) {
   });
 
   if (result.count === 0) {
-    return { error: "Day off not found" };
+    return { error: "errors.dayOffNotFound" };
   }
 
   revalidatePath("/[locale]/dashboard/schedule", "page");

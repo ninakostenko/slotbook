@@ -2,6 +2,7 @@ import { CalendarDays } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
 
+import { LocaleSwitcher } from "@/components/i18n/locale-switcher";
 import { BottomNav, SidebarNav } from "@/components/dashboard/nav-links";
 import { RequireBusiness } from "@/components/dashboard/require-business";
 import { SignOutButton } from "@/components/dashboard/sign-out-button";
@@ -32,7 +33,8 @@ export default function DashboardLayout({
       <aside className="sticky top-0 hidden h-dvh w-60 shrink-0 flex-col gap-6 border-r p-4 md:flex">
         <Logo />
         <SidebarNav />
-        <div className="mt-auto border-t pt-4">
+        <div className="mt-auto flex flex-col gap-4 border-t pt-4">
+          <LocaleSwitcher className="self-start" />
           <Suspense fallback={<UserMenuSkeleton />}>
             <UserMenu />
           </Suspense>
@@ -42,7 +44,10 @@ export default function DashboardLayout({
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="flex items-center justify-between border-b px-4 py-3 md:hidden">
           <Logo />
-          <SignOutButton />
+          <div className="flex items-center gap-2">
+            <LocaleSwitcher />
+            <SignOutButton />
+          </div>
         </header>
         <main className="flex-1 px-4 py-6 pb-24 md:px-8 md:pb-8">
           {children}

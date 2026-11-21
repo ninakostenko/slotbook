@@ -8,7 +8,7 @@ import { prisma } from "@/lib/db";
 // There is no sign-in: whoever has the token (a long random string) may cancel it.
 export async function cancelBookingByToken(token: string) {
   if (typeof token !== "string" || token.length === 0) {
-    return { error: "Booking not found" };
+    return { error: "errors.bookingNotFound" };
   }
 
   const booking = await prisma.booking.findUnique({
@@ -16,7 +16,7 @@ export async function cancelBookingByToken(token: string) {
     select: { id: true, business: { select: { slug: true } } },
   });
   if (!booking) {
-    return { error: "Booking not found" };
+    return { error: "errors.bookingNotFound" };
   }
 
   // Only a confirmed booking that has not started yet can be cancelled.
@@ -29,7 +29,7 @@ export async function cancelBookingByToken(token: string) {
     data: { status: "CANCELLED" },
   });
   if (result.count === 0) {
-    return { error: "This booking can no longer be cancelled." };
+    return { error: "errors.cannotCancel" };
   }
 
   revalidatePath("/[locale]/booking/[token]", "page");

@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { Suspense } from "react";
 
 import { AddServiceDialog } from "@/components/services/add-service-dialog";
@@ -7,34 +6,39 @@ import { ServiceActiveSwitch } from "@/components/services/service-active-switch
 import { Badge } from "@/components/ui/badge";
 import { getCurrentBusiness } from "@/lib/dal";
 import { prisma } from "@/lib/db";
+import type { Locale } from "@/lib/i18n/config";
+import { pageTitle } from "@/lib/i18n/metadata";
+import { getI18n } from "@/lib/i18n/server";
+import { getT } from "@/lib/i18n/translate";
 
-export const metadata: Metadata = {
-  title: "Services · SlotBook",
-};
+export const generateMetadata = pageTitle("meta.services");
 
-export default function ServicesPage() {
+export default async function ServicesPage({
+  params,
+}: PageProps<"/[locale]/dashboard/services">) {
+  const { locale, t } = await getI18n(params);
+
   return (
     <div className="mx-auto max-w-5xl">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-            Services
+            {t("dashboard.nav.services")}
           </h1>
-          <p className="mt-2 text-muted-foreground">
-            Add the services clients can book.
-          </p>
+          <p className="mt-2 text-muted-foreground">{t("services.subtitle")}</p>
         </div>
         <AddServiceDialog />
       </div>
 
-      <Suspense fallback={<p className="mt-8">Loading…</p>}>
-        <ServicesList />
+      <Suspense fallback={<p className="mt-8">{t("common.loading")}</p>}>
+        <ServicesList locale={locale} />
       </Suspense>
     </div>
   );
 }
 
-async function ServicesList() {
+async function ServicesList({ locale }: { locale: Locale }) {
+  const t = getT(locale);
   const business = await getCurrentBusiness();
   if (!business) return null;
 
@@ -48,9 +52,9 @@ async function ServicesList() {
   if (services.length === 0) {
     return (
       <div className="mt-8 rounded-lg border border-dashed p-10 text-center">
-        <p className="font-medium">No services yet</p>
+        <p className="font-medium">{t("services.emptyTitle")}</p>
         <p className="mt-1 text-sm text-muted-foreground">
-          Add your first service so clients can book it.
+          {t("services.emptyText")}
         </p>
       </div>
     );
@@ -74,10 +78,15 @@ async function ServicesList() {
               >
                 {service.name}
               </span>
-              {!service.isActive && <Badge variant="secondary">Hidden</Badge>}
+              {!service.isActive && (
+                <Badge variant="secondary">{t("services.hidden")}</Badge>
+              )}
             </div>
             <p className="mt-0.5 text-sm text-muted-foreground">
-              {service.durationMinutes} min · {service.priceCents / 100} UAH
+              {t("services.meta", {
+                minutes: service.durationMinutes,
+                price: service.priceCents / 100,
+              })}
             </p>
           </div>
 

@@ -25,7 +25,7 @@ export type Translate = (
 const catalogs: Record<Locale, Messages> = { en, uk };
 
 export function getMessages(locale: Locale): Messages {
-  return catalogs[locale];
+  return catalogs[locale] ?? en;
 }
 
 function lookup(messages: Messages, key: string): string | undefined {

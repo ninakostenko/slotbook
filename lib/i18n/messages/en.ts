@@ -25,6 +25,7 @@ export const en = {
     continue: "Continue",
     closed: "Closed",
     change: "Change",
+    close: "Close",
     language: "Language",
     uah: "{amount} UAH",
     minutes: "{count} min",

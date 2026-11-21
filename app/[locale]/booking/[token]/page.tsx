@@ -1,17 +1,19 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
 import { CancelMyBookingButton } from "@/components/booking/cancel-my-booking-button";
+import { LocaleSwitcher } from "@/components/i18n/locale-switcher";
+import { LoadingText } from "@/components/i18n/loading-text";
 import { prisma } from "@/lib/db";
 import { formatDayInZone, formatTimeInZone } from "@/lib/time";
+import { pageTitle } from "@/lib/i18n/metadata";
+import { getI18n } from "@/lib/i18n/server";
 
-export const metadata: Metadata = {
-  title: "Your booking · SlotBook",
-  // The address is private (it holds the cancel token), so search engines must skip it.
+// The address is private (it holds the cancel token), so search engines must skip it.
+export const generateMetadata = pageTitle("meta.confirmation", {
   robots: { index: false, follow: false },
-};
+});
 
 // The page itself does not await params, so the shell can be prerendered and only
 // the part inside <Suspense> waits for data (the same pattern as the booking page).
@@ -20,7 +22,10 @@ export default function BookingConfirmationPage({
 }: PageProps<"/[locale]/booking/[token]">) {
   return (
     <main className="mx-auto max-w-xl px-4 py-12 sm:py-16">
-      <Suspense fallback={<p className="text-center">Loading…</p>}>
+      <div className="flex justify-end">
+        <LocaleSwitcher />
+      </div>
+      <Suspense fallback={<LoadingText className="text-center" />}>
         <Confirmation params={params} />
       </Suspense>
     </main>
@@ -33,6 +38,7 @@ async function Confirmation({
   params: PageProps<"/[locale]/booking/[token]">["params"];
 }) {
   const { token } = await params;
+  const { locale, t } = await getI18n(params);
 
   const booking = await prisma.booking.findUnique({
     where: { cancelToken: token },
@@ -54,22 +60,22 @@ async function Confirmation({
         {booking.business.name}
       </p>
       <h1 className="font-display mt-3 text-4xl font-semibold tracking-tight text-balance sm:text-5xl">
-        {cancelled ? "Booking cancelled" : "You are booked"}
+        {cancelled
+          ? t("confirmation.cancelledTitle")
+          : t("confirmation.booked")}
       </h1>
       <p className="mt-3 text-muted-foreground">
-        {cancelled
-          ? "This time is free again. You are welcome to pick another one."
-          : "Keep this page: you can cancel here if your plans change."}
+        {cancelled ? t("confirmation.freeAgain") : t("confirmation.keepPage")}
       </p>
 
       <dl className="mt-8 rounded-2xl border bg-card p-6 text-left shadow-sm">
-        <Row label="Service" value={booking.service.name} />
+        <Row label={t("confirmation.service")} value={booking.service.name} />
         <Row
-          label="When"
-          value={`${formatDayInZone(booking.startsAt, timezone)}, ${formatTimeInZone(booking.startsAt, timezone)}–${formatTimeInZone(booking.endsAt, timezone)}`}
+          label={t("confirmation.when")}
+          value={`${formatDayInZone(booking.startsAt, timezone, locale)}, ${formatTimeInZone(booking.startsAt, timezone)}–${formatTimeInZone(booking.endsAt, timezone)}`}
         />
-        <Row label="Name" value={booking.clientName} />
-        <Row label="Email" value={booking.clientEmail} />
+        <Row label={t("confirmation.name")} value={booking.clientName} />
+        <Row label={t("confirmation.email")} value={booking.clientEmail} />
       </dl>
 
       <div className="mt-8 flex flex-col items-center gap-3">
@@ -78,7 +84,7 @@ async function Confirmation({
           href={`/book/${booking.business.slug}`}
           className="text-sm text-primary hover:underline"
         >
-          Book another time
+          {t("confirmation.another")}
         </Link>
       </div>
     </div>

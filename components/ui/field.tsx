@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "cn";
 
+import { useT } from "@/components/i18n/i18n-provider";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 
@@ -181,6 +182,8 @@ function FieldError({
 }: React.ComponentProps<"div"> & {
   errors?: Array<{ message?: string } | undefined>;
 }) {
+  // The messages of the form checks are keys of the messages; t() turns them into text.
+  const t = useT();
   const content = useMemo(() => {
     if (children) {
       return children;
@@ -195,18 +198,19 @@ function FieldError({
     ];
 
     if (uniqueErrors?.length == 1) {
-      return uniqueErrors[0]?.message;
+      const message = uniqueErrors[0]?.message;
+      return message ? t(message) : message;
     }
 
     return (
       <ul className="ml-4 flex list-disc flex-col gap-1">
         {uniqueErrors.map(
           (error, index) =>
-            error?.message && <li key={index}>{error.message}</li>,
+            error?.message && <li key={index}>{t(error.message)}</li>,
         )}
       </ul>
     );
-  }, [children, errors]);
+  }, [children, errors, t]);
 
   if (!content) {
     return null;

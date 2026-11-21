@@ -20,12 +20,12 @@ function toServiceData(data: ServiceInput) {
 export async function createService(input: unknown) {
   const business = await getCurrentBusiness();
   if (!business) {
-    return { error: "Business not found" };
+    return { error: "errors.businessNotFound" };
   }
 
   const parsed = serviceSchema.safeParse(input);
   if (!parsed.success) {
-    return { error: "Some fields are not valid." };
+    return { error: "errors.invalidForm" };
   }
   await prisma.service.create({
     data: {
@@ -41,12 +41,12 @@ export async function createService(input: unknown) {
 export async function updateService(serviceId: string, input: unknown) {
   const business = await getCurrentBusiness();
   if (!business) {
-    return { error: "Business not found" };
+    return { error: "errors.businessNotFound" };
   }
 
   const parsed = serviceSchema.safeParse(input);
   if (!parsed.success) {
-    return { error: "Some fields are not valid." };
+    return { error: "errors.invalidForm" };
   }
 
   const result = await prisma.service.updateMany({
@@ -55,7 +55,7 @@ export async function updateService(serviceId: string, input: unknown) {
   });
 
   if (result.count === 0) {
-    return { error: "Service not found" };
+    return { error: "errors.serviceNotFound" };
   }
 
   revalidatePath("/[locale]/dashboard/services", "page");
@@ -65,12 +65,12 @@ export async function updateService(serviceId: string, input: unknown) {
 export async function setServiceActive(serviceId: string, isActive: unknown) {
   const business = await getCurrentBusiness();
   if (!business) {
-    return { error: "Business not found" };
+    return { error: "errors.businessNotFound" };
   }
 
   const parsed = z.boolean().safeParse(isActive);
   if (!parsed.success) {
-    return { error: "Invalid value" };
+    return { error: "errors.invalidValue" };
   }
 
   const result = await prisma.service.updateMany({
@@ -79,7 +79,7 @@ export async function setServiceActive(serviceId: string, isActive: unknown) {
   });
 
   if (result.count === 0) {
-    return { error: "Service not found" };
+    return { error: "errors.serviceNotFound" };
   }
 
   revalidatePath("/[locale]/dashboard/services", "page");
