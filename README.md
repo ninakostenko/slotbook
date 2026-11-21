@@ -12,6 +12,8 @@ Online booking for solo service providers (nail artists, massage therapists, bar
 
 ![The booking page: a service, a calendar and the times of the chosen day, with a taken time struck through](docs/screenshots/booking.png)
 
+![The owner dashboard, signed in as the demo owner: today's numbers and the next bookings](docs/screenshots/dashboard.png)
+
 ## What it does
 
 **For clients** (`/book/<link>`)
