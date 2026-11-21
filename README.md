@@ -16,6 +16,8 @@ Online booking for solo service providers (nail artists, massage therapists, bar
 
 ## What it does
 
+The whole interface is available in **English and Ukrainian**. Use the EN / УКР switch in the corner.
+
 **For clients** (`/book/<link>`)
 
 - Choose a service, then a day on a calendar. Closed days and days off are greyed out.
@@ -95,16 +97,16 @@ curl -H "Authorization: Bearer $CRON_SECRET" http://localhost:3000/api/demo/rese
 ## Project layout
 
 ```text
-app/            routes: landing, (auth), onboarding, (dashboard)/dashboard, book/[slug], booking/[token], api
+app/[locale]/   routes: landing, (auth), onboarding, (dashboard)/dashboard, book/[slug], booking/[token]
+app/api/        auth and the demo reset route
 components/     UI by feature (booking, bookings, services, schedule, settings, ...) and shadcn in ui/
-lib/            slots.ts, availability.ts, time.ts, dal.ts, auth.ts, demo.ts, validations/
+lib/            slots.ts, availability.ts, time.ts, dal.ts, auth.ts, demo.ts, i18n/, validations/
 prisma/         schema.prisma and migrations (the exclusion constraint is a hand-written one)
 docs/           figma-reference: a visual reference from the first design, not imported by the app
 ```
 
 ## Roadmap
 
-- English and Ukrainian interface
 - E-mails: booking confirmation and reminders
 - Change the booking link from Settings
 - Photos for the business page
