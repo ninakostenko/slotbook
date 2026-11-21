@@ -5,7 +5,7 @@ import { Loader2 } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { Controller, useForm, useWatch, type FieldPath } from "react-hook-form";
 
-import { completeOnboarding } from "@/app/onboarding/actions";
+import { completeOnboarding } from "@/app/[locale]/onboarding/actions";
 import { Button } from "@/components/ui/button";
 import {
   Card,

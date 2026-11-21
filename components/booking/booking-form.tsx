@@ -1,6 +1,6 @@
 "use client";
 
-import { createBooking } from "@/app/book/[slug]/actions";
+import { createBooking } from "@/app/[locale]/book/[slug]/actions";
 import { Button } from "@/components/ui/button";
 import {
   Field,

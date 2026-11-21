@@ -3,7 +3,7 @@
 import { Loader2 } from "lucide-react";
 import { useState, useTransition } from "react";
 
-import { cancelBookingByToken } from "@/app/booking/[token]/actions";
+import { cancelBookingByToken } from "@/app/[locale]/booking/[token]/actions";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,

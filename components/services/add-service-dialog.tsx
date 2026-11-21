@@ -5,7 +5,7 @@ import { Loader2, Plus } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
-import { createService } from "@/app/(dashboard)/dashboard/services/actions";
+import { createService } from "@/app/[locale]/(dashboard)/dashboard/services/actions";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,

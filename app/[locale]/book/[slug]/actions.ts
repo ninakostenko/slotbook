@@ -57,14 +57,14 @@ export async function createBooking(
     });
   } catch (error) {
     if (isOverlapError(error)) {
-      revalidatePath(`/book/${slug}`);
+      revalidatePath("/[locale]/book/[slug]", "page");
       return { ok: false, error: "This time was just taken" };
     }
     throw error;
   }
 
   // Tell Next.js the free times changed, so the page shows the new list at once.
-  revalidatePath(`/book/${slug}`);
+  revalidatePath("/[locale]/book/[slug]", "page");
 
   return {
     ok: true,

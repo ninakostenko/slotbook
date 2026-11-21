@@ -35,7 +35,7 @@ export async function createService(input: unknown) {
   });
 
   // Каже Next.js оновити сторінку послуг, щоб нова послуга одразу з'явилась у списку.
-  revalidatePath("/dashboard/services");
+  revalidatePath("/[locale]/dashboard/services", "page");
 }
 
 export async function updateService(serviceId: string, input: unknown) {
@@ -58,7 +58,7 @@ export async function updateService(serviceId: string, input: unknown) {
     return { error: "Service not found" };
   }
 
-  revalidatePath("/dashboard/services");
+  revalidatePath("/[locale]/dashboard/services", "page");
 }
 // Hides a service from clients (isActive: false) or shows it again (true).
 // Services are never deleted, so past bookings keep their service.
@@ -82,5 +82,5 @@ export async function setServiceActive(serviceId: string, isActive: unknown) {
     return { error: "Service not found" };
   }
 
-  revalidatePath("/dashboard/services");
+  revalidatePath("/[locale]/dashboard/services", "page");
 }

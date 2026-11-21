@@ -26,6 +26,6 @@ export async function updateBusiness(input: unknown) {
       description: parsed.data.description || null,
     },
   });
-  revalidatePath("/dashboard/settings");
-  revalidatePath(`/book/${business.slug}`);
+  revalidatePath("/[locale]/dashboard/settings", "page");
+  revalidatePath("/[locale]/book/[slug]", "page");
 }

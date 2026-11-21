@@ -3,7 +3,7 @@
 import { Loader2 } from "lucide-react";
 import { useState, useTransition } from "react";
 
-import { cancelBooking } from "@/app/(dashboard)/dashboard/bookings/actions";
+import { cancelBooking } from "@/app/[locale]/(dashboard)/dashboard/bookings/actions";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,

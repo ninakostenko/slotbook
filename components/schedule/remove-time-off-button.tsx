@@ -3,7 +3,7 @@
 import { Loader2, X } from "lucide-react";
 import { useTransition } from "react";
 
-import { removeTimeOff } from "@/app/(dashboard)/dashboard/schedule/actions";
+import { removeTimeOff } from "@/app/[locale]/(dashboard)/dashboard/schedule/actions";
 import { Button } from "@/components/ui/button";
 
 type RemoveTimeOffButtonProps = {

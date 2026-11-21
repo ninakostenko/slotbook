@@ -5,7 +5,7 @@ import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
-import { updateBusiness } from "@/app/(dashboard)/dashboard/settings/actions";
+import { updateBusiness } from "@/app/[locale]/(dashboard)/dashboard/settings/actions";
 import { Button } from "@/components/ui/button";
 import {
   Field,

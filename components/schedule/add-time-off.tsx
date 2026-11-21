@@ -3,7 +3,7 @@
 import { CalendarPlus, Loader2 } from "lucide-react";
 import { useState, useTransition } from "react";
 
-import { addTimeOff } from "@/app/(dashboard)/dashboard/schedule/actions";
+import { addTimeOff } from "@/app/[locale]/(dashboard)/dashboard/schedule/actions";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {

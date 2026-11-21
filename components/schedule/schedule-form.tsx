@@ -5,7 +5,7 @@ import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 
-import { updateSchedule } from "@/app/(dashboard)/dashboard/schedule/actions";
+import { updateSchedule } from "@/app/[locale]/(dashboard)/dashboard/schedule/actions";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { TimeSelect } from "@/components/schedule/time-select";

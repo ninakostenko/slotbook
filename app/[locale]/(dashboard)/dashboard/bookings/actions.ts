@@ -22,6 +22,6 @@ export async function cancelBooking(bookingId: string) {
     return { error: "Booking not found" };
   }
 
-  revalidatePath("/dashboard", "layout");
-  revalidatePath(`/book/${business.slug}`);
+  revalidatePath("/[locale]/dashboard", "layout");
+  revalidatePath("/[locale]/book/[slug]", "page");
 }

@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 // the part inside <Suspense> waits for data (the same pattern as the booking page).
 export default function BookingConfirmationPage({
   params,
-}: PageProps<"/booking/[token]">) {
+}: PageProps<"/[locale]/booking/[token]">) {
   return (
     <main className="mx-auto max-w-xl px-4 py-12 sm:py-16">
       <Suspense fallback={<p className="text-center">Loading…</p>}>
@@ -30,7 +30,7 @@ export default function BookingConfirmationPage({
 async function Confirmation({
   params,
 }: {
-  params: PageProps<"/booking/[token]">["params"];
+  params: PageProps<"/[locale]/booking/[token]">["params"];
 }) {
   const { token } = await params;
 

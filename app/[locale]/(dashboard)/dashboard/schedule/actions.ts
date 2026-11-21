@@ -33,7 +33,7 @@ export async function updateSchedule(input: unknown) {
     prisma.workingHours.createMany({ data: rows }),
   ]);
 
-  revalidatePath("/dashboard/schedule");
+  revalidatePath("/[locale]/dashboard/schedule", "page");
 }
 
 export async function addTimeOff(input: unknown) {
@@ -66,7 +66,7 @@ export async function addTimeOff(input: unknown) {
     throw error;
   }
 
-  revalidatePath("/dashboard/schedule");
+  revalidatePath("/[locale]/dashboard/schedule", "page");
 }
 
 export async function removeTimeOff(timeOffId: string) {
@@ -84,5 +84,5 @@ export async function removeTimeOff(timeOffId: string) {
     return { error: "Day off not found" };
   }
 
-  revalidatePath("/dashboard/schedule");
+  revalidatePath("/[locale]/dashboard/schedule", "page");
 }

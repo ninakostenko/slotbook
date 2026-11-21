@@ -32,7 +32,7 @@ export async function cancelBookingByToken(token: string) {
     return { error: "This booking can no longer be cancelled." };
   }
 
-  revalidatePath(`/booking/${token}`);
-  revalidatePath(`/book/${booking.business.slug}`);
-  revalidatePath("/dashboard", "layout");
+  revalidatePath("/[locale]/booking/[token]", "page");
+  revalidatePath("/[locale]/book/[slug]", "page");
+  revalidatePath("/[locale]/dashboard", "layout");
 }

@@ -5,7 +5,7 @@ import { Loader2, Pencil } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
-import { updateService } from "@/app/(dashboard)/dashboard/services/actions";
+import { updateService } from "@/app/[locale]/(dashboard)/dashboard/services/actions";
 import { Button } from "@/components/ui/button";
 
 import {

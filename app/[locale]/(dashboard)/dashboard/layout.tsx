@@ -22,7 +22,7 @@ function Logo() {
 // Only the parts that read the session wait, behind <Suspense>.
 export default function DashboardLayout({
   children,
-}: LayoutProps<"/dashboard">) {
+}: LayoutProps<"/[locale]/dashboard">) {
   return (
     <div className="flex min-h-full flex-1">
       <Suspense fallback={null}>

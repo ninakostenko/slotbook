@@ -2,7 +2,7 @@
 
 import { useOptimistic, useState, useTransition } from "react";
 
-import { setServiceActive } from "@/app/(dashboard)/dashboard/services/actions";
+import { setServiceActive } from "@/app/[locale]/(dashboard)/dashboard/services/actions";
 import { Switch } from "@/components/ui/switch";
 
 type ServiceActiveSwitchProps = {

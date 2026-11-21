@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default function BookingPage({
   params,
   searchParams,
-}: PageProps<"/book/[slug]">) {
+}: PageProps<"/[locale]/book/[slug]">) {
   return (
     <main className="mx-auto max-w-2xl px-4 py-12 sm:py-16">
       <Suspense fallback={<p>Loading…</p>}>
@@ -28,8 +28,8 @@ async function BusinessServices({
   params,
   searchParams,
 }: {
-  params: PageProps<"/book/[slug]">["params"];
-  searchParams: PageProps<"/book/[slug]">["searchParams"];
+  params: PageProps<"/[locale]/book/[slug]">["params"];
+  searchParams: PageProps<"/[locale]/book/[slug]">["searchParams"];
 }) {
   const { slug } = await params;
   const query = await searchParams;
