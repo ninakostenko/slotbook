@@ -22,7 +22,7 @@ export default function BookingConfirmationPage({
 }: PageProps<"/[locale]/booking/[token]">) {
   return (
     <main className="mx-auto max-w-xl px-4 py-12 sm:py-16">
-      <div className="flex justify-end">
+      <div className="mb-6 flex justify-end">
         <LocaleSwitcher />
       </div>
       <Suspense fallback={<LoadingText className="text-center" />}>

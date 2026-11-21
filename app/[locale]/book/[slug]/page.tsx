@@ -18,7 +18,7 @@ export default function BookingPage({
 }: PageProps<"/[locale]/book/[slug]">) {
   return (
     <main className="mx-auto max-w-2xl px-4 py-12 sm:py-16">
-      <div className="flex justify-end">
+      <div className="mb-6 flex justify-end">
         <LocaleSwitcher />
       </div>
       <Suspense fallback={<LoadingText className="text-center" />}>
